@@ -43,9 +43,11 @@ void instDecExec(unsigned int instWord)
     funct3 = (instWord >> 12) & 0x00000007;
     rs1 = (instWord >> 15) & 0x0000001F;
     rs2 = (instWord >> 20) & 0x0000001F;
+    funct7 = (instWord >> 25) & 0x0000007F;
 
     // â€” inst[31] â€” inst[30:25] inst[24:21] inst[20]
     I_imm = ((instWord >> 20) & 0x7FF) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
+    B_imm = 2*(((instWord>>8)& 0xF) | ((instWord>>25) & 0x3F)|((instWord>>7)& 0x1)|((instWord>>31)&0x1)|(((instWord >> 31) ? 0xFFFFF800 : 0x0)));
 
     printPrefix(instPC, instWord);
 
@@ -60,18 +62,33 @@ void instDecExec(unsigned int instWord)
                     regs[rd] = regs[rs1] + regs[rs2];
                 }
                 break;
+            case 1:
+                cout << "\tSLL\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+                regs[rd] = regs[rs1] << regs[rs2];
+                break;
             default:
                 cout << "\tUnkown R Instruction \n";
+
         }
+
     } else if(opcode == 0x13){	// I instructions
         switch(funct3){
             case 0:	cout << "\tADDI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
                 regs[rd] = regs[rs1] + (int)I_imm;
                 break;
+            case 2:
+                cout << "\tSLTI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+                if(regs[rs1]<(int)I_imm)regs[rd]=1;else regs[rd]=0;
+                break;
             default:
                 cout << "\tUnkown I Instruction \n";
         }
-    } else {
+    }
+      else if(opcode==0x63) //B instructions
+          switch(funct3)
+          case 0:cout << "\tBEQ\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+            if(regs[rs1]==regs[rs2]) /*do true stuff*/;
+    else {
         cout << "\tUnkown Instruction \n";
     }
 
