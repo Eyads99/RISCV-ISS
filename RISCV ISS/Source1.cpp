@@ -66,6 +66,35 @@ void instDecExec(unsigned int instWord)
                 cout << "\tSLL\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
                 regs[rd] = regs[rs1] << regs[rs2];
                 break;
+            case 2:
+                cout << "\tSLT\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";/////////////////not done
+                if(regs[rs1]<regs[rs2]) regs[rd]=1;else regs[rd]=0;
+                break;
+            case 3:
+                cout << "\tSLTU\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";/////////////////not done
+                if(regs[rs1]<regs[rs2]) regs[rd]=1;else regs[rd]=0;
+                break;
+            case 4:
+                cout << "\tXOR\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+                regs[rd]=regs[rs1]^regs[rs2];
+                break;
+            case 5: if (funct7==32) {
+                    cout << "\tSRA\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+                    regs[rd] = (signed int)regs[rs1] >> regs[rs2];
+                    break;
+                }
+                else
+                    cout << "\tSRL\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+                regs[rd] = (unsigned int)regs[rs1] >> regs[rs2];
+                break;
+            case 6:
+                cout << "\tOR\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+                regs[rd]=regs[rs1]|regs[rs2];
+                break;
+            case 7:
+                cout <<"\tOR\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+                regs[rd]=regs[rs1]&regs[rs2];
+                break;
             default:
                 cout << "\tUnkown R Instruction \n";
 
