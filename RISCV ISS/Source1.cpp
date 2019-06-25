@@ -105,42 +105,42 @@ void instDecExec(unsigned int instWord)
 	}
 	else if (opcode == 0x13) {	// I instructions
 		switch (funct3) {
-		case 0:	cout << "\tADDI\tx" << rd << ", x" << rs1 << ", " << (signed int)I_imm << "\n";
+		case 0:	cout << "\tADDI\tx" <<dec<< rd << ", x" << rs1 << ", " << (int)I_imm << "\n";
 			regs[rd] = regs[rs1] + (signed)I_imm;
 			break;
 		case 2:
-			cout << "\tSLTI\tx" << rd << ", x" << rs1 << ", "  << (signed int)I_imm << "\n";
+			cout << "\tSLTI\tx" <<dec<< rd << ", x" << rs1 << ", " << (int)I_imm << "\n";
 			if ((signed)regs[rs1] < (signed int)I_imm)regs[rd] = 1; else regs[rd] = 0;
 			break;
 		case 3:
-			cout << "\tSLTIU\tx" << rd << ", x" << rs1 << ", " << (signed int)I_imm << "\n";
+			cout << "\tSLTIU\tx" <<dec<< rd << ", x" << rs1 << ", " << (int)I_imm << "\n";
 			if ((unsigned)regs[rs1] < (unsigned)I_imm)regs[rd] = 1; else regs[rd] = 0;
 			break;
 		case 4:
-			cout << "\tXORI\tx" << rd << ", x" << rs1 << ", " <<  (signed int)I_imm << "\n";
+			cout << "\tXORI\tx" <<dec<< rd << ", x" << rs1 << ", " << (int)I_imm << "\n";
 			regs[rd] = regs[rs1] ^ I_imm;
 			break;
 		case 6:
-			cout << "\tORI\tx" << rd << ", x" << rs1 << ", " << (signed int)I_imm << "\n";
+			cout << "\tORI\tx" <<dec<< rd << ", x" << rs1 << ", " << (int)I_imm << "\n";
 			regs[rd] = regs[rs1] | I_imm;
 			break;
 		case 7:
-			cout << "\tANDI\tx" << rd << ", x" << rs1 << ", " <<  (signed int)I_imm << "\n";
+			cout << "\tANDI\tx" <<dec<< rd << ", x" << rs1 << ", " << (int)I_imm << "\n";
 			regs[rd] = regs[rs1] & I_imm;
 			break;
 		case 1:
-			cout << "\tSLLI\tx" << rd << ", x" << rs1 << ", " <<  (int)rs2 << "\n";
+			cout << "\tSLLI\tx" <<dec<< rd << ", x" << rs1 << ", " <<  (int)rs2 << "\n";
 			regs[rd] = regs[rs1] << (int)I_imm;
 			break;
 		case 5:
 			if (funct7 == 32) 
 			{
-				cout << "\tSRAI\tx" << rd << ", x" << rs1 << ", " << (signed int)rs2 << "\n";
+				cout << "\tSRAI\tx" <<dec<< rd << ", x" << rs1 << ", " << (signed int)rs2 << "\n";
 				regs[rd] = (signed int)regs[rs1] >> regs[rs2];
 			}
 			else
 			{
-				cout << "\tSRL\tx" << rd << ", x" << rs1 << ", " << (int)rs2 << "\n";
+				cout << "\tSRL\tx" <<dec<< rd << ", x" << rs1 << ", " << (int)rs2 << "\n";
 				regs[rd] = (unsigned int)regs[rs1] >> regs[rs2];
 			}
 			break;
