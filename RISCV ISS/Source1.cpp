@@ -29,7 +29,7 @@ void printPrefix(unsigned int instA, unsigned int instW) {
 	cout << "0x" << hex << std::setfill('0') << std::setw(8) << instA << "\t0x" << std::setw(8) << instW;
 }
 void ecaller(unsigned int &a0,unsigned int &a1,unsigned int &a7)
-{unsigned int address,numChar;
+{unsigned int address;
     switch(a7){
         case:1{cout<<dec<<a0<<endl;break;}
         case:4{address=a0;
