@@ -28,6 +28,23 @@ void emitError(char *s)
 void printPrefix(unsigned int instA, unsigned int instW) {
 	cout << "0x" << hex << std::setfill('0') << std::setw(8) << instA << "\t0x" << std::setw(8) << instW;
 }
+void ecaller(unsigned int &a0,unsigned int &a1,unsigned int &a7)
+{unsigned int address,numChar;
+    switch(a7){
+        case:1{cout<<dec<<a0<<endl;break;}
+        case:4{address=a0;
+            while(memory[address]!='\0')
+            {
+                cout<<memory[address];address++;
+            }
+        break;}
+        case:5{cin>>a0;break;}
+        case:8{fgets(memory[a0],a1,stdin);break;}
+        case:10{exit(0);}
+        default:cout<<"Unknown Ecall service"
+    }
+
+}
 
 void instDecExec(unsigned int instWord)
 {
@@ -67,11 +84,11 @@ void instDecExec(unsigned int instWord)
 			break;
 		case 2:
 			cout << "\tSLT\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";/////////////////not done
-			if (regs[rs1] < regs[rs2]) regs[rd] = 1; else regs[rd] = 0;
+			if ((signed)regs[rs1] < (signed)regs[rs2]) regs[rd] = 1; else regs[rd] = 0;
 			break;
 		case 3:
 			cout << "\tSLTU\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";/////////////////not done
-			if (regs[rs1] < regs[rs2]) regs[rd] = 1; else regs[rd] = 0;
+			if ((unsigned)regs[rs1] < (unsigned)regs[rs2]) regs[rd] = 1; else regs[rd] = 0;
 			break;
 		case 4:
 			cout << "\tXOR\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
