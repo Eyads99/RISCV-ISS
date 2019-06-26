@@ -115,7 +115,7 @@ void instDecExec(unsigned int instWord)
 			regs[rd] = regs[rs1] | regs[rs2];
 			break;
 		case 7:
-			cout << "\tOR\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+			cout << "\tand\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
 			regs[rd] = regs[rs1] & regs[rs2];
 			break;
 		default:
@@ -161,7 +161,7 @@ void instDecExec(unsigned int instWord)
 			}
 			else
 			{
-				cout << "\tSRL\tx" << dec << rd << ", x" << rs1 << ", " << (int)rs2 << "\n";
+				cout << "\tSRLI\tx" << dec << rd << ", x" << rs1 << ", " << (int)rs2 << "\n";
 				regs[rd] = (unsigned int)regs[rs1] >> regs[rs2];
 			}
 			break;
@@ -169,12 +169,27 @@ void instDecExec(unsigned int instWord)
 			cout << "\tUnkown I Instruction \n";
 		}
 	}
-	else if (opcode == 0x63) //B instructions
+	else if (opcode == 0x63) //SB instructions
 		switch (funct3) {
 		case 0:
 			cout << "\tBEQ\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
-			if (regs[rs1] == regs[rs2]) {/*do true stuff*/break; }
-		}
+			if (regs[rs1] == regs[rs2]) {pc+=(signed int)B_imm;break;}
+	    case 1:
+            cout << "\tBNE\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+            if (regs[rs1] != regs[rs2]) {pc+=(signed int)B_imm;break;}
+	    case 2:
+            cout << "\tBLT\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+            if (regs[rs1] < regs[rs2]) {pc+=(signed int)B_imm;break;}
+	    case 3:
+            cout << "\tBGE\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+            if (regs[rs1] >= regs[rs2]) {pc+=(signed int)B_imm;break;}
+	    case 4:
+            cout << "\tBLTU\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+            if ((unsigned int)regs[rs1] < (unsigned intregs[rs2]) {pc+=(signed int)B_imm;break;}
+	    case 5:
+            cout << "\tBGEU\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+            if ((unsigned int)regs[rs1] >= (unsigned intregs[rs2]) {pc+=(signed int)B_imm;break;}
+        }
 	else {
 		cout << "\tUnkown Instruction \n";
 	}
