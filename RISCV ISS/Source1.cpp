@@ -42,8 +42,8 @@ void ecaller(unsigned int &a0, unsigned int &a1, unsigned int &a7)
 	case 5:{cin >> a0; break; }
 	case 8: {char* point = &memory[a0];
 		fgets(point, a1, stdin); break; }
-	case10:{exit(0); }
-	default:cout << "Unknown Ecall service"
+	case 10:{exit(0); }
+	default:cout << "Unknown Ecall service";
 	}
 
 }
