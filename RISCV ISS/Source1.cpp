@@ -65,8 +65,10 @@ void instDecExec(unsigned int instWord)
 
 	// â€” inst[31] â€” inst[30:25] inst[24:21] inst[20]
 	I_imm = ((instWord >> 20) & 0x7FF) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
-	B_imm = 2 * (((instWord >> 8) & 0xF) | ((instWord >> 25) & 0x3F) | ((instWord >> 7) & 0x1) | ((instWord >> 31) & 0x1) | (((instWord >> 31) ? 0xFFFFF800 : 0x0)));
-
+	B_imm = 2 * (((instWord >> 8) & 0xF) | ((instWord >> 21) & 0x3F0) | ((instWord << 3) & 0x400) | ((instWord >> 20) & 0x800) | (((instWord >> 31) ? 0xFFFFF800 : 0x0)));
+	S_imm = ((instWord>>7)& 0x1F)|((instWord>>19)& 0xFE0)|(((instWord >> 31) ? 0xFFFFF800 : 0x0));
+	U_imm = ((instWord)&0xFFFFF000);
+	J_imm = ((instWord>>21)&0x3FF)|((instWord>>10)&0x400)|((instWord>>1)&0x7F800)|((instWord>>12)&0x80000)|(((instWord >> 31) ? 0xFFF80000 : 0x0));
 	printPrefix(instPC, instWord);
 
 	if (opcode == 0x33) {		// R Instructions
