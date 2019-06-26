@@ -28,21 +28,23 @@ void emitError(char *s)
 void printPrefix(unsigned int instA, unsigned int instW) {
 	cout << "0x" << hex << std::setfill('0') << std::setw(8) << instA << "\t0x" << std::setw(8) << instW;
 }
-void ecaller(unsigned int &a0,unsigned int &a1,unsigned int &a7)
-{unsigned int address;
-    switch(a7){
-        case:1{cout<<dec<<a0<<endl;break;}
-        case:4{address=a0;
-            while(memory[address]!='\0')
-            {
-                cout<<memory[address];address++;
-            }
-        break;}
-        case:5{cin>>a0;break;}
-        case:8{fgets(memory[a0],a1,stdin);break;}
-        case:10{exit(0);}
-        default:cout<<"Unknown Ecall service"
-    }
+void ecaller(unsigned int &a0, unsigned int &a1, unsigned int &a7)
+{
+	unsigned int address;
+	switch (a7) {
+	case 1:	{cout << dec << a0 << endl; break; }
+	case 4:{address = a0;
+		while (memory[address] != '\0')
+		{
+			cout << memory[address]; address++;
+		}
+		break; }
+	case 5:{cin >> a0; break; }
+	case 8: {char* point = &memory[a0];
+		fgets(point, a1, stdin); break; }
+	case10:{exit(0); }
+	default:cout << "Unknown Ecall service"
+	}
 
 }
 
@@ -95,15 +97,15 @@ void instDecExec(unsigned int instWord)
 			regs[rd] = regs[rs1] ^ regs[rs2];
 			break;
 		case 5:
-			if (funct7 == 32) 
+			if (funct7 == 32)
 			{
-			cout << "\tSRA\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
-			regs[rd] = (signed int)regs[rs1] >> regs[rs2];
+				cout << "\tSRA\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+				regs[rd] = (signed int)regs[rs1] >> regs[rs2];
 			}
 			else
 			{
-			cout << "\tSRL\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
-			regs[rd] = (unsigned int)regs[rs1] >> regs[rs2];
+				cout << "\tSRL\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+				regs[rd] = (unsigned int)regs[rs1] >> regs[rs2];
 			}
 			break;
 		case 6:
@@ -122,42 +124,42 @@ void instDecExec(unsigned int instWord)
 	}
 	else if (opcode == 0x13) {	// I instructions
 		switch (funct3) {
-		case 0:	cout << "\tADDI\tx" <<dec<< rd << ", x" << rs1 << ", " << (int)I_imm << "\n";
+		case 0:	cout << "\tADDI\tx" << dec << rd << ", x" << rs1 << ", " << (int)I_imm << "\n";
 			regs[rd] = regs[rs1] + (signed)I_imm;
 			break;
 		case 2:
-			cout << "\tSLTI\tx" <<dec<< rd << ", x" << rs1 << ", " << (int)I_imm << "\n";
+			cout << "\tSLTI\tx" << dec << rd << ", x" << rs1 << ", " << (int)I_imm << "\n";
 			if ((signed)regs[rs1] < (signed int)I_imm)regs[rd] = 1; else regs[rd] = 0;
 			break;
 		case 3:
-			cout << "\tSLTIU\tx" <<dec<< rd << ", x" << rs1 << ", " << (int)I_imm << "\n";
+			cout << "\tSLTIU\tx" << dec << rd << ", x" << rs1 << ", " << (int)I_imm << "\n";
 			if ((unsigned)regs[rs1] < (unsigned)I_imm)regs[rd] = 1; else regs[rd] = 0;
 			break;
 		case 4:
-			cout << "\tXORI\tx" <<dec<< rd << ", x" << rs1 << ", " << (int)I_imm << "\n";
+			cout << "\tXORI\tx" << dec << rd << ", x" << rs1 << ", " << (int)I_imm << "\n";
 			regs[rd] = regs[rs1] ^ I_imm;
 			break;
 		case 6:
-			cout << "\tORI\tx" <<dec<< rd << ", x" << rs1 << ", " << (int)I_imm << "\n";
+			cout << "\tORI\tx" << dec << rd << ", x" << rs1 << ", " << (int)I_imm << "\n";
 			regs[rd] = regs[rs1] | I_imm;
 			break;
 		case 7:
-			cout << "\tANDI\tx" <<dec<< rd << ", x" << rs1 << ", " << (int)I_imm << "\n";
+			cout << "\tANDI\tx" << dec << rd << ", x" << rs1 << ", " << (int)I_imm << "\n";
 			regs[rd] = regs[rs1] & I_imm;
 			break;
 		case 1:
-			cout << "\tSLLI\tx" <<dec<< rd << ", x" << rs1 << ", " <<  (int)rs2 << "\n";
+			cout << "\tSLLI\tx" << dec << rd << ", x" << rs1 << ", " << (int)rs2 << "\n";
 			regs[rd] = regs[rs1] << (int)I_imm;
 			break;
 		case 5:
-			if (funct7 == 32) 
+			if (funct7 == 32)
 			{
-				cout << "\tSRAI\tx" <<dec<< rd << ", x" << rs1 << ", " << (signed int)rs2 << "\n";
+				cout << "\tSRAI\tx" << dec << rd << ", x" << rs1 << ", " << (signed int)rs2 << "\n";
 				regs[rd] = (signed int)regs[rs1] >> regs[rs2];
 			}
 			else
 			{
-				cout << "\tSRL\tx" <<dec<< rd << ", x" << rs1 << ", " << (int)rs2 << "\n";
+				cout << "\tSRL\tx" << dec << rd << ", x" << rs1 << ", " << (int)rs2 << "\n";
 				regs[rd] = (unsigned int)regs[rs1] >> regs[rs2];
 			}
 			break;
@@ -167,10 +169,10 @@ void instDecExec(unsigned int instWord)
 	}
 	else if (opcode == 0x63) //B instructions
 		switch (funct3) {
-            case 0:
-                cout << "\tBEQ\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int) B_imm << "\n";
-                if (regs[rs1] == regs[rs2]) {/*do true stuff*/break; }
-        }
+		case 0:
+			cout << "\tBEQ\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+			if (regs[rs1] == regs[rs2]) {/*do true stuff*/break; }
+		}
 	else {
 		cout << "\tUnkown Instruction \n";
 	}
