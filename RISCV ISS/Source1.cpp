@@ -225,8 +225,15 @@ void instDecExec(unsigned int instWord)
     }
     else if(opcode==6F)//JAL
     {
-        //
-
+        cout << "\tJAL\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int) J_imm<< "\n";
+        regs[rd]=pc+4;
+        pc=pc+J_imm;
+    }
+    else if(opcode==67)//JALR
+    {
+        cout << "\tJALR\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int) J_imm<< "\n";
+        regs[rd]=pc+4;
+        pc=rs1+J_imm;
     }
 	else {
 		cout << "\tUnknown Instruction \n";
@@ -251,7 +258,7 @@ int main(int argc, char *argv[]) {
 		inFile.seekg(0, inFile.beg);
 		if (!inFile.read((char *)memory, fsize)) emitError((char*)"Cannot read from input file\n");
 
-		while (true) {
+		while (true) { regs[0]=0;//makes sure that the zero reg is always 0
 			instWord = (unsigned char)memory[pc] |
 				(((unsigned char)memory[pc + 1]) << 8) |
 				(((unsigned char)memory[pc + 2]) << 16) |
