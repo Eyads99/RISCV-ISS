@@ -42,7 +42,7 @@ void ecaller(unsigned int &a0, unsigned int &a1, unsigned int &a7)
 	case 5:{cin >> a0; break; }
 	case 8: {char* point = &memory[a0];
 		fgets(point, a1, stdin); break; }
-	case 10:{exit(0); }
+	case 10:{return 0; }
 	default:cout << "Unknown Ecall service";
 	}
 
@@ -192,24 +192,44 @@ void instDecExec(unsigned int instWord)
         default:cout<<"unknown SB instruction"<<endl;
         }
 
-	else if(opcode==0x23)
-	{
+	else if(opcode==0x23)//S instructions
+    {
         switch (funct3) {
-            case 0:cout << "\tSB\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)S_imm << "\n";
-                memory[rs2+S_imm]=rs1;break;
-            case 1:cout << "\tSH\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)S_imm << "\n";
-             for(int x=0;x<2;x++)
-                 memory[rs2+S_imm+x]=rs1;
-             break;
-            case 2:cout << "\tSW\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)S_imm << "\n";
-                for(int x=0;x<4;x++)
-                    memory[rs2+S_imm+x]=rs1;
+            case 0:
+                cout << "\tSB\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int) S_imm << "\n";
+                memory[rs2 + S_imm] = rs1;
                 break;
-	}
+            case 1:
+                cout << "\tSH\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int) S_imm << "\n";
+                for (int x = 0; x < 2; x++)
+                    memory[rs2 + S_imm + x] = rs1;
+                break;
+            case 2:
+                cout << "\tSW\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int) S_imm << "\n";
+                for (int x = 0; x < 4; x++)
+                    memory[rs2 + S_imm + x] = rs1;
+                break;
+            default:
+                cout<<"Unknown S instruction"<<endl;
+        }
+    }
+    else if(opcode==0x37)//LUI instruction
+    {
+        cout << "\tLUI\tx" << rd <<", " << hex << "0x" << (int) U_imm << "\n";
+        regs[rd]=U_imm<<12;
+    }
+    else if(opcode==0x17)//AUIPC instruction
+    {
+        cout << "\tAUIPC\tx" << rd <<", " << hex << "0x" << (int) U_imm << "\n";
+        regs[rd]=pc+U_imm<<12;
+    }
+    else if(opcode==6F)//JAL
+    {
+        //
 
-
+    }
 	else {
-		cout << "\tUnkown Instruction \n";
+		cout << "\tUnknown Instruction \n";
 	}
 
 }
@@ -247,5 +267,5 @@ int main(int argc, char *argv[]) {
 			cout << "x" << dec << i << ": \t" << "0x" << hex << std::setfill('0') << std::setw(8) << regs[i] << "\n";
 
 	}
-	else emitError((char*)"Cannot access input file\n");
+	else emitError((char*)"Cannot access input file\n");return 0;
 }
