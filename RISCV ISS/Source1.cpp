@@ -42,7 +42,7 @@ void ecaller(unsigned int &a0, unsigned int &a1, unsigned int &a7)
 	case 5:{cin >> a0; break; }
 	case 8: {char* point = &memory[a0];
 		fgets(point, a1, stdin); break; }
-	case 10:{return 0; }
+	case 10:{exit (0); }
 	default:cout << "Unknown Ecall service";
 	}
 
@@ -185,10 +185,10 @@ void instDecExec(unsigned int instWord)
             if (regs[rs1] >= regs[rs2]) {pc+=(signed int)B_imm;break;}
 	    case 4:
             cout << "\tBLTU\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
-            if ((unsigned int)regs[rs1] < (unsigned intregs[rs2]) {pc+=(signed int)B_imm;break;}
+            if ((unsigned int)regs[rs1] < (unsigned int)regs[rs2]) {pc+=(signed int)B_imm;break;}
 	    case 5:
             cout << "\tBGEU\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
-            if ((unsigned int)regs[rs1] >= (unsigned intregs[rs2]) {pc+=(signed int)B_imm;break;}
+            if ((unsigned int)regs[rs1] >= (unsigned int)regs[rs2]) {pc+=(signed int)B_imm;break;}
         default:cout<<"unknown SB instruction"<<endl;
         }
 
@@ -223,13 +223,13 @@ void instDecExec(unsigned int instWord)
         cout << "\tAUIPC\tx" << rd <<", " << hex << "0x" << (int) U_imm << "\n";
         regs[rd]=pc+U_imm<<12;
     }
-    else if(opcode==6F)//JAL
+    else if(opcode==0x6F)//JAL
     {
         cout << "\tJAL\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int) J_imm<< "\n";
         regs[rd]=pc+4;
         pc=pc+J_imm;
     }
-    else if(opcode==67)//JALR
+    else if(opcode==0x67)//JALR
     {
         cout << "\tJALR\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int) J_imm<< "\n";
         regs[rd]=pc+4;
