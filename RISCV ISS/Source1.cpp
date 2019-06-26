@@ -189,7 +189,25 @@ void instDecExec(unsigned int instWord)
 	    case 5:
             cout << "\tBGEU\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
             if ((unsigned int)regs[rs1] >= (unsigned intregs[rs2]) {pc+=(signed int)B_imm;break;}
+        default:cout<<"unknown SB instruction"<<endl;
         }
+
+	else if(opcode==0x23)
+	{
+        switch (funct3) {
+            case 0:cout << "\tSB\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)S_imm << "\n";
+                memory[rs2+S_imm]=rs1;break;
+            case 1:cout << "\tSH\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)S_imm << "\n";
+             for(int x=0;x<2;x++)
+                 memory[rs2+S_imm+x]=rs1;
+             break;
+            case 2:cout << "\tSW\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)S_imm << "\n";
+                for(int x=0;x<4;x++)
+                    memory[rs2+S_imm+x]=rs1;
+                break;
+	}
+
+
 	else {
 		cout << "\tUnkown Instruction \n";
 	}
