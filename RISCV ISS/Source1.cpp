@@ -52,6 +52,7 @@ void instDecExec(unsigned int instWord)
 {
 	unsigned int rd, rs1, rs2, funct3, funct7, opcode;
 	unsigned int I_imm, S_imm, B_imm, U_imm, J_imm;
+	unsigned int CI_imm,CSS_imm,CIW_imm,CL_imm,CS_imm,CB_imm,CJ_imm;
 	unsigned int address;
 
 	unsigned int instPC = pc - 4;
