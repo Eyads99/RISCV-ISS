@@ -266,7 +266,7 @@ int main(int argc, char *argv[]) {
 				(((unsigned char)memory[pc + 3]) << 24);
 			pc += 4;
 			// remove the following line once you have a complete simulator
-			if (pc == 32) break;			// stop when PC reached address 32
+			if (pc >65) break;			// stop when PC reached address 32 ¡NOTE HAS BEEN EDITED FROM SKELETON TO 65!
 			instDecExec(instWord);
 		}
 
