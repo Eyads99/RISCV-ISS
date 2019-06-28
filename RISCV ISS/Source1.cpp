@@ -42,7 +42,11 @@ void ecaller(unsigned int &a0, unsigned int &a1, unsigned int &a7)
 	case 5:{cin >> a0; break; }
 	case 8: {char* point = &memory[a0];
 		fgets(point, a1, stdin); break; }
-	case 10:{exit (0); }
+	case 10:{
+	        for (int i = 0; i < 32; i++)
+            cout << "x" << dec << i << ": \t" << "0x" << hex << std::setfill('0') << std::setw(8) << regs[i] << "\n";//dumping regs
+	        exit (0);
+	}
 	default:cout << "Unknown Ecall service";
 	}
 
