@@ -162,12 +162,12 @@ void instDecExec(unsigned int instWord)
 			if (funct7 == 32)
 			{
 				cout << "\tSRAI\tx" << dec << rd << ", x" << rs1 << ", " << (signed int)rs2 << "\n";
-				regs[rd] = (signed int)regs[rs1] >> regs[rs2];
+				regs[rd] = (signed int)regs[rs1] >>(int)I_imm; //regs[rs2];
 			}
 			else
 			{
 				cout << "\tSRLI\tx" << dec << rd << ", x" << rs1 << ", " << (int)rs2 << "\n";
-				regs[rd] = (unsigned int)regs[rs1] >> regs[rs2];
+				regs[rd] = (unsigned int)regs[rs1] >>I_imm;// regs[rs2];
 			}
 			break;
 		default:
