@@ -32,20 +32,20 @@ void ecaller(unsigned int &a0, unsigned int &a1, unsigned int &a7)
 {
 	unsigned int address;
 	switch (a7) {
-	case 1:	{cout << dec << a0 << endl; break; }
-	case 4:{address = a0;
+	case 1: {cout << dec << a0 << endl; break; }
+	case 4: {address = a0;
 		while (memory[address] != '\0')
 		{
 			cout << memory[address]; address++;
 		}
 		break; }
-	case 5:{cin >> a0; break; }
+	case 5: {cin >> a0; break; }
 	case 8: {char* point = &memory[a0];
 		fgets(point, a1, stdin); break; }
-	case 10:{
-	        for (int i = 0; i < 32; i++)
-            cout << "x" << dec << i << ": \t" << "0x" << hex << std::setfill('0') << std::setw(8) << regs[i] << "\n";//dumping regs
-	        exit (0);
+	case 10: {
+		for (int i = 0; i < 32; i++)
+			cout << "x" << dec << i << ": \t" << "0x" << hex << std::setfill('0') << std::setw(8) << regs[i] << "\n";//dumping regs
+		exit(0);
 	}
 	default:cout << "Unknown Ecall service";
 	}
@@ -56,7 +56,7 @@ void instDecExec(unsigned int instWord)
 {
 	unsigned int rd, rs1, rs2, funct3, funct7, opcode;
 	unsigned int I_imm, S_imm, B_imm, U_imm, J_imm;
-	unsigned int CI_imm,CSS_imm,CIW_imm,CL_imm,CS_imm,CB_imm,CJ_imm;
+	unsigned int CI_imm, CSS_imm, CIW_imm, CL_imm, CS_imm, CB_imm, CJ_imm;
 	unsigned int address;
 
 	unsigned int instPC = pc - 4;
@@ -71,9 +71,9 @@ void instDecExec(unsigned int instWord)
 	// â€” inst[31] â€” inst[30:25] inst[24:21] inst[20]
 	I_imm = ((instWord >> 20) & 0x7FF) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
 	B_imm = 2 * (((instWord >> 8) & 0xF) | ((instWord >> 21) & 0x3F0) | ((instWord << 3) & 0x400) | ((instWord >> 20) & 0x800) | (((instWord >> 31) ? 0xFFFFF800 : 0x0)));
-	S_imm = ((instWord>>7)& 0x1F)|((instWord>>19)& 0xFE0)|(((instWord >> 31) ? 0xFFFFF800 : 0x0));
-	U_imm = ((instWord)&0xFFFFF000);
-	J_imm = ((instWord>>21)&0x3FF)|((instWord>>10)&0x400)|((instWord>>1)&0x7F800)|((instWord>>12)&0x80000)|(((instWord >> 31) ? 0xFFF80000 : 0x0));
+	S_imm = ((instWord >> 7) & 0x1F) | ((instWord >> 20) & 0xFE0) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
+	U_imm = ((instWord) & 0xFFFFF000);
+	J_imm = ((instWord >> 21) & 0x3FF) | ((instWord >> 10) & 0x400) | ((instWord >> 1) & 0x7F800) | ((instWord >> 12) & 0x80000) | (((instWord >> 31) ? 0xFFF80000 : 0x0));
 	printPrefix(instPC, instWord);
 
 	if (opcode == 0x33) {		// R Instructions
@@ -162,88 +162,127 @@ void instDecExec(unsigned int instWord)
 			if (funct7 == 32)
 			{
 				cout << "\tSRAI\tx" << dec << rd << ", x" << rs1 << ", " << (signed int)rs2 << "\n";
-				regs[rd] = (signed int)regs[rs1] >>(int)I_imm; //regs[rs2];
+				regs[rd] = (signed int)regs[rs1] >> (int)I_imm; //regs[rs2];
 			}
 			else
 			{
 				cout << "\tSRLI\tx" << dec << rd << ", x" << rs1 << ", " << (int)rs2 << "\n";
-				regs[rd] = (unsigned int)regs[rs1] >>I_imm;// regs[rs2];
+				regs[rd] = (unsigned int)regs[rs1] >> I_imm;// regs[rs2];
 			}
 			break;
 		default:
 			cout << "\tUnkown I Instruction \n";
 		}
 	}
-	else if (opcode == 0x63) //SB instructions
+	else if (opcode == 0x3)  // load instructions
+	{
+		switch (funct3) {
+		case 0:
+			cout << "\tLB\tx" << dec << rd << ", " << (signed)I_imm << "(x" << rs1 << ")" << "\n";
+			regs[rd] = (memory[regs[rs1] + (signed)I_imm] & 0xff)| ((((regs[rd] >> 7)& 0x1) ? 0xFFFFFF00 : 0x0));
+			break;
+		case 1:
+			cout << "\tLH\tx" << dec << rd << ", " << (signed)I_imm << "(x" << rs1 << ")" << "\n";
+			regs[rd] = ((memory[regs[rs1] + (signed)I_imm] & 0xff) | ((memory[regs[rs1] + (signed)I_imm + 1] << 8) & 0xff00))| ((((regs[rd] >> 15) & 0x1) ? 0xFFFF0000 : 0x0));
+			break;
+		case 2:
+			cout << "\tLW\tx" << dec << rd << ", " << (signed)I_imm << "(x" << rs1 << ")" << "\n";
+			regs[rd] = ((memory[regs[rs1] + (signed)I_imm] & 0xff) | ((memory[regs[rs1] + (signed)I_imm + 1] << 8) & 0xff00) | ((memory[regs[rs1] + (signed)I_imm + 2] << 16) & 0xff0000) | ((memory[regs[rs1] + (signed)I_imm + 3] << 24) & 0xff000000));
+			break;
+		case 4:
+			cout << "\tLBU\tx" << dec << rd << ", " << (signed)I_imm << "(x" << rs1 << ")" << "\n";
+			regs[rd] = (memory[regs[rs1] + (signed)I_imm] & 0xff) & 0x000000ff;
+			break;
+		case 5:
+			cout << "\tLHU\tx" << dec << rd << ", " << (signed)I_imm << "(x" << rs1 << ")" << "\n";
+			regs[rd] = ((memory[regs[rs1] + (signed)I_imm] & 0xff) | ((memory[regs[rs1] + (signed)I_imm + 1] << 8) & 0xff00)) & 0x0000ffff;
+			break;
+		default:
+			cout << "\tUnkown Load Instruction \n";
+		}
+	}
+	else if (opcode == 0x63)  //SB instructions
+	 {
+
 		switch (funct3) {
 		case 0:
 			cout << "\tBEQ\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
-			if (regs[rs1] == regs[rs2]) {pc+=(signed int)B_imm;break;}
-	    case 1:
-            cout << "\tBNE\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
-            if (regs[rs1] != regs[rs2]) {pc+=(signed int)B_imm;break;}
-	    case 2:
-            cout << "\tBLT\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
-            if (regs[rs1] < regs[rs2]) {pc+=(signed int)B_imm;break;}
-	    case 3:
-            cout << "\tBGE\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
-            if (regs[rs1] >= regs[rs2]) {pc+=(signed int)B_imm;break;}
-	    case 4:
-            cout << "\tBLTU\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
-            if ((unsigned int)regs[rs1] < (unsigned int)regs[rs2]) {pc+=(signed int)B_imm;break;}
-	    case 5:
-            cout << "\tBGEU\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
-            if ((unsigned int)regs[rs1] >= (unsigned int)regs[rs2]) {pc+=(signed int)B_imm;break;}
-        default:cout<<"unknown SB instruction"<<endl;
-        }
+			if (regs[rs1] == regs[rs2]) { pc += (signed int)B_imm; break; }
+		case 1:
+			cout << "\tBNE\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+			if (regs[rs1] != regs[rs2]) { pc += (signed int)B_imm; break; }
+		case 2:
+			cout << "\tBLT\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+			if (regs[rs1] < regs[rs2]) { pc += (signed int)B_imm; break; }
+		case 3:
+			cout << "\tBGE\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+			if (regs[rs1] >= regs[rs2]) { pc += (signed int)B_imm; break; }
+		case 4:
+			cout << "\tBLTU\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+			if ((unsigned int)regs[rs1] < (unsigned int)regs[rs2]) { pc += (signed int)B_imm; break; }
+		case 5:
+			cout << "\tBGEU\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+			if ((unsigned int)regs[rs1] >= (unsigned int)regs[rs2]) { pc += (signed int)B_imm; break; }
+		default:cout << "unknown SB instruction" << endl;
+		}
+}
+	else if (opcode == 0x23)//S instructions
+	{
+	switch (funct3) {
+	case 0:
+		cout << "\tSB\tx" << dec << rs2 << ", " << (signed)S_imm << "(x" << rs1 << ")" << "\n";
+		memory[regs[rs1] + (signed)S_imm] = regs[rs2]&0xff;
+		break;
+	case 1:
+		cout << "\tSH\tx" << dec << rs2 << ", " << (signed)S_imm << "(x" << rs1 << ")" << "\n";
+		
+			memory[regs[rs1] +(signed) S_imm] = regs[rs1] & 0xff;
+			memory[regs[rs1]+(signed)S_imm+1] = (regs[rs2]>>8)&0xff;
 
-	else if(opcode==0x23)//S instructions
-    {
-        switch (funct3) {
-            case 0:
-                cout << "\tSB\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int) S_imm << "\n";
-                memory[rs2 + S_imm] = rs1;
-                break;
-            case 1:
-                cout << "\tSH\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int) S_imm << "\n";
-                for (int x = 0; x < 2; x++)
-                    memory[rs2 + S_imm + x] = rs1;
-                break;
-            case 2:
-                cout << "\tSW\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int) S_imm << "\n";
-                for (int x = 0; x < 4; x++)
-                    memory[rs2 + S_imm + x] = rs1;
-                break;
-            default:
-                cout<<"Unknown S instruction"<<endl;
-        }
-    }
-    else if(opcode==0x37)//LUI instruction
-    {
-        cout << "\tLUI\tx" << rd <<", " << hex << "0x" << (int) U_imm << "\n";
-        regs[rd]=U_imm<<12;
-    }
-    else if(opcode==0x17)//AUIPC instruction
-    {
-        cout << "\tAUIPC\tx" << rd <<", " << hex << "0x" << (int) U_imm << "\n";
-        regs[rd]=pc+U_imm<<12;
-    }
-    else if(opcode==0x6F)//JAL
-    {
-        cout << "\tJAL\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int) J_imm<< "\n";
-        regs[rd]=pc+4;
-        pc=pc+J_imm;
-    }
-    else if(opcode==0x67)//JALR
-    {
-        cout << "\tJALR\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int) J_imm<< "\n";
-        regs[rd]=pc+4;
-        pc=rs1+J_imm;
-    }
-	else {
-		cout << "\tUnknown Instruction \n";
+		break;
+	case 2:
+		cout << "\tSW\tx" << dec << rs2 << ", " << (signed)S_imm << "(x" << rs1 << ")" << "\n";
+
+		memory[regs[rs1] + (signed)S_imm] = regs[rs1] & 0xff;
+		memory[regs[rs1] + (signed)S_imm + 1] = (regs[rs2] >> 8) & 0xff;
+		memory[regs[rs1] + (signed)S_imm + 2] = (regs[rs2] >> 16) & 0xff;
+		memory[regs[rs1] + (signed)S_imm + 3] = (regs[rs2] >> 24) & 0xff;
+		break;
+	default:
+		cout << "Unknown S instruction" << endl;
 	}
+	}
+	else if (opcode == 0x37)//LUI instruction
+	{
+	cout << "\tLUI\tx" << rd << ", " << hex << "0x" << (int)U_imm << "\n";
+	regs[rd] = U_imm << 12;
+	}
+	else if (opcode == 0x17)//AUIPC instruction
+	{
+	cout << "\tAUIPC\tx" << rd << ", " << hex << "0x" << (int)U_imm << "\n";
+	regs[rd] = pc + (U_imm << 12);
+	}
+	else if (opcode == 0x6F)//JAL
+	{
+	cout << "\tJAL\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)J_imm << "\n";
+	regs[rd] = pc + 4;
+	pc = pc + J_imm;
+	}
+	else if (opcode == 0x67)//JALR
+	{
+	cout << "\tJALR\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+	regs[rd] = pc + 4;
+	pc = regs[rs1] + (signed)I_imm;
+	}
+	/*else if (opcode == 0x73)
+	{
+	cout << "\tecall\n";
+	ecaller(regs[10], regs[11], regs[17]);
 
+	}*/
+	else {
+	cout << "\tUnknown Instruction \n";
+	}
 }
 
 int main(int argc, char *argv[]) {
@@ -263,14 +302,15 @@ int main(int argc, char *argv[]) {
 		inFile.seekg(0, inFile.beg);
 		if (!inFile.read((char *)memory, fsize)) emitError((char*)"Cannot read from input file\n");
 
-		while (true) { regs[0]=0;//makes sure that the zero reg is always 0
+		while (true) {
+			regs[0] = 0;//makes sure that the zero reg is always 0
 			instWord = (unsigned char)memory[pc] |
 				(((unsigned char)memory[pc + 1]) << 8) |
 				(((unsigned char)memory[pc + 2]) << 16) |
 				(((unsigned char)memory[pc + 3]) << 24);
 			pc += 4;
 			// remove the following line once you have a complete simulator
-			if (pc >65) break;		// stop when PC reached address 32 ¡NOTE HAS BEEN EDITED FROM SKELETON TO 64!
+			if (pc > 65) break;		// stop when PC reached address 32 ¡NOTE HAS BEEN EDITED FROM SKELETON TO 64!
 			instDecExec(instWord);
 		}
 
@@ -279,5 +319,5 @@ int main(int argc, char *argv[]) {
 			cout << "x" << dec << i << ": \t" << "0x" << hex << std::setfill('0') << std::setw(8) << regs[i] << "\n";
 
 	}
-	else emitError((char*)"Cannot access input file\n");return 0;
+	else emitError((char*)"Cannot access input file\n"); return 0;
 }
