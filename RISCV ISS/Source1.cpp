@@ -57,15 +57,17 @@ void ecaller(int regs[32])
 }
 void instDecExecC(unsigned int instWord)
 {
-	unsigned int rd, rs2, funct3, funct4, opcode;
+	unsigned int rd, rs2,funct2 ,funct3, funct4,funct6 ,opcode;
 	unsigned int rd_c, rs1_c, rs2_c, rs2_r, rd_r;
 	unsigned int CI_imm, CSS_imm, CIW_imm, CL_imm, CS_imm, CB_imm, CJ_imm;
 
 	opcode = instWord & 0x3;
 	rd = (instWord >> 7) & 0x1f;
 	rs2 = (instWord >> 2) & 0x1f;
+	funct2 =(instWord >> 4) & 0x3;
 	funct3 = (instWord >> 13) & 0x7;
 	funct4 = (instWord >> 12) & 0xf;
+	funct6 = (instWord >> 10) & 0xf;
 	rd_c = (instWord >> 2) & 0x7;
 	rs1_c = (instWord >> 7) & 0x7;
 	rs2_c = (instWord >> 2) & 0x7;
@@ -105,6 +107,27 @@ void instDecExecC(unsigned int instWord)
 			cout << "\tC.LUI\tx" << dec << rd << ", " << (signed)CI_imm << "\n";
 			regs[rd] = (signed)CI_imm << 12;
 			break;
+		    case 4:
+		        switch(funct2){
+		            case:0
+                        cout << "\tC.SUB\tx" << dec << rd << ", " << rd<<rs2 << "\n";
+		                 regs[rd]=regs[rd]-regs[rs2];
+		                 break;
+		            case:1
+                        cout << "\tC.XOR\tx" << dec << rd << ", " << rd<<rs2 << "\n";
+                        regs[rd]=regs[rd]^regs[rs2];
+                        break;
+		            case: 2
+                        cout << "\tC.OR\tx" << dec << rd << ", " << rd<<rs2 << "\n";
+                        regs[rd]=regs[rd]|regs[rs2];
+                        break;
+		            case 3:
+                        cout << "\tC.AND\tx" << dec << rd << ", " << rd<<rs2 << "\n";
+                        regs[rd]=regs[rd]&regs[rs2];
+                        break;
+                    default:
+                        cout<<"unkown C.A instruction"<<endl;
+		        }
 		case 5:
 			cout << "\tC.J\tx" << dec << (signed)CJ_imm << "\n";
 			pc = pc + (signed)CJ_imm;
