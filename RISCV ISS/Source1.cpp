@@ -77,6 +77,7 @@ void instDecExecC(unsigned int instWord)
 
 	(signed)CJ_imm = (((instWord >> 3) & 0x7) | ((instWord >> 8) & 0x8) | ((instWord << 2) & 0x10) | ((instWord >> 2) & 0x20) | ((instWord) & 0x40) | ((instWord >> 2) & 0x180) | ((instWord << 1) & 0x200) | ((instWord >> 2) & 0x400)| ((((instWord >> 12) & 0x1) ? 0xFFFFFFF0 : 0x0)))<<1;
 	CI_imm = ((instWord >> 2) & 0x1f) | ((instWord >> 7) & 0x20) || ((((instWord >> 12) & 0x1) ? 0xFFFFFFF0 : 0x0));
+    CB_imm = (instWord>>2&0xf)|(instWord>>7&0x40);
 
 	if (opcode == 0x1) {
 		switch (funct3)
@@ -126,7 +127,12 @@ void instDecExecC(unsigned int instWord)
                         regs[rd]=regs[rd]&regs[rs2];
                         break;
                     default:
-                        cout<<"unkown C.A instruction"<<endl;
+                        if(funct6&0x3==0)
+                        {  cout << "\tC.SRLI\tx" << dec << rd << ", " << rd<<","<<CB_imm << "\n";
+                            (unsigned)regs[rd] = (unsigned int)regs[rd] >> CB_imm;}
+                        else{
+                            cout << "\tC.SRAI\tx" << dec << rd << ", " << rd<<","<<CB_imm << "\n";
+                            (signed)regs[rd] = (unsigned int)regs[rd] >> CB_imm;}
 		        }
 		case 5:
 			cout << "\tC.J\tx" << dec << (signed)CJ_imm << "\n";
