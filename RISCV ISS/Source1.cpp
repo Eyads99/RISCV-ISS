@@ -51,12 +51,102 @@ void ecaller(unsigned int &a0, unsigned int &a1, unsigned int &a7)
 	}
 
 }
+void instDecExecC(unsigned int instWord)
+{
+	unsigned int rd, rs2, funct3, funct4, opcode;
+	unsigned int rd_r, rs1_r, rs2_r;
+	unsigned int CI_imm, CSS_imm, CIW_imm, CL_imm, CS_imm, CB_imm, CJ_imm;
 
+	opcode = instWord & 0x3;
+	rd = (instWord >> 7) & 0x1f;
+	rs2 = (instWord >> 2) & 0x1f;
+	funct3 = (instWord >> 13) & 0x7;
+	funct4 = (instWord >> 12) & 0xf;
+	rd_r = (instWord >> 2) & 0x7;
+	rs1_r = (instWord >> 7) & 0x7;
+	rs2_r = (instWord >> 2) & 0x7;
+
+	CI_imm = ((instWord >> 2) & 0x1f) | ((instWord >> 7) & 0x20)|| ((((instWord >> 12)&0x1) ? 0xFFFFFFF0 : 0x0));
+
+	if (opcode == 0x1) {
+		switch (funct3)
+		{
+		case 0:
+			if (rd == 0)
+			{
+			cout << "\tC.NOP\tx" << dec << rd << ", " << 0 << "\n";
+			break; 
+			}
+			else
+			{
+			cout << "\tC.ADDI\tx" << dec << rd << ", " << (signed)CI_imm << "\n";
+			regs[rd] = regs[rd] + (signed)CI_imm;
+			break;
+			}
+		case 2:
+			cout << "\tC.LI\tx" << dec << rd << ", " << (signed)CI_imm << "\n";
+			regs[rd] = (signed)CI_imm;
+			break;
+		case 3:
+			cout << "\tC.LUI\tx" << dec << rd << ", " << (signed)CI_imm << "\n";
+			regs[rd] = (signed)CI_imm<<12;
+			break;
+
+		default:
+			break;
+		}
+	}
+	else if (opcode == 0x2)
+	{
+		switch (funct3)
+		{
+		case 0:
+			cout << "\tC.SLLI\tx" << dec << rd << ", " << (int)CI_imm << "\n";
+			regs[rd] = regs[rd]<<(int)CI_imm;
+			break;
+		case 4:
+			if ((instWord >> 12) & 0x1 == 0) {
+				if (rs2 == 0)
+				{
+					cout << "\tC.JR\tx" << dec << 0 << ", x" << rd << "\n";
+					pc = regs[rd];
+					break;
+				}
+				else
+				{
+					cout << "\tC.MV\tx" << dec << rd << ", x" << rs2 << "\n";
+					regs[rd] = regs[rs2];
+					break;
+				}
+			}
+			else {
+				if ((rd == 0) && (rs2 == 0)) {
+					cout << "\tC.EBREAK\n"; ?//not yet compleated   ///////////////////////
+				}
+				else if (rs2 == 0) {
+					cout << "\tC.JALR\tx" << dec << rd << "\n";
+					regs[1] = pc + 2;
+					pc = rd;
+					break;
+				}
+				else {
+					cout << "\tC.ADD\tx" << dec << rd << ", x" << rs2 << "\n";
+					regs[rd] = regs[rd] + regs[rs2];
+					break;
+				}
+			}
+
+		default:
+			break;
+		}
+	}
+
+
+}
 void instDecExec(unsigned int instWord)
 {
 	unsigned int rd, rs1, rs2, funct3, funct7, opcode;
 	unsigned int I_imm, S_imm, B_imm, U_imm, J_imm;
-	unsigned int CI_imm, CSS_imm, CIW_imm, CL_imm, CS_imm, CB_imm, CJ_imm;
 	unsigned int address;
 
 	unsigned int instPC = pc - 4;
@@ -304,14 +394,23 @@ int main(int argc, char *argv[]) {
 
 		while (true) {
 			regs[0] = 0;//makes sure that the zero reg is always 0
-			instWord = (unsigned char)memory[pc] |
-				(((unsigned char)memory[pc + 1]) << 8) |
-				(((unsigned char)memory[pc + 2]) << 16) |
-				(((unsigned char)memory[pc + 3]) << 24);
-			pc += 4;
+			instWord = (unsigned char)memory[pc] );
+			if ((instWord & 0x3) == 0x3)
+			{
+				instWord = instWord | (((unsigned char)memory[pc + 1]) << 8) |
+					(((unsigned char)memory[pc + 2]) << 16) |
+					(((unsigned char)memory[pc + 3]) << 24);
+				pc += 4;
+			}
+			else
+			{
+				instWord = instWord | (((unsigned char)memory[pc + 1]) << 8);
+				pc += 2;
+				instDecExec(instWord);
+			}
 			// remove the following line once you have a complete simulator
 			if (pc > 65) break;		// stop when PC reached address 32 ¡NOTE HAS BEEN EDITED FROM SKELETON TO 64!
-			instDecExec(instWord);
+			
 		}
 
 		// dump the registers
