@@ -28,8 +28,12 @@ void emitError(char *s)
 void printPrefix(unsigned int instA, unsigned int instW) {
 	cout << "0x" << hex << std::setfill('0') << std::setw(8) << instA << "\t0x" << std::setw(8) << instW;
 }
-void ecaller(unsigned int &a0, unsigned int &a1, unsigned int &a7)
+void ecaller(int regs[32] )
 {
+    int a7=regs[17];
+    int a0=regs[10];
+    int a1=regs[11];
+
 	unsigned int address;
 	switch (a7) {
 	case 1: {cout << dec << a0 << endl; break; }
@@ -364,12 +368,12 @@ void instDecExec(unsigned int instWord)
 	regs[rd] = pc + 4;
 	pc = regs[rs1] + (signed)I_imm;
 	}
-	/*else if (opcode == 0x73)
+	else if (opcode == 0x73)
 	{
-	cout << "\tecall\n";
-	ecaller(regs[10], regs[11], regs[17]);
+	cout << "\tecall\t";
+	ecaller(regs[]);
 
-	}*/
+	}
 	else {
 	cout << "\tUnknown Instruction \n";
 	}
