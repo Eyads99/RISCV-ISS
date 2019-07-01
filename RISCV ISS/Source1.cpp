@@ -58,7 +58,7 @@ void ecaller(int regs[32] )
 void instDecExecC(unsigned int instWord)
 {
 	unsigned int rd, rs2, funct3, funct4, opcode;
-	unsigned int rd_r, rs1_r, rs2_r;
+	unsigned int rd_c, rs1_c, rs2_c,rs2_r,rd_r;
 	unsigned int CI_imm, CSS_imm, CIW_imm, CL_imm, CS_imm, CB_imm, CJ_imm;
 
 	opcode = instWord & 0x3;
@@ -66,9 +66,12 @@ void instDecExecC(unsigned int instWord)
 	rs2 = (instWord >> 2) & 0x1f;
 	funct3 = (instWord >> 13) & 0x7;
 	funct4 = (instWord >> 12) & 0xf;
-	rd_r = (instWord >> 2) & 0x7;
-	rs1_r = (instWord >> 7) & 0x7;
-	rs2_r = (instWord >> 2) & 0x7;
+	rd_c = (instWord >> 2) & 0x7;
+	rs1_c = (instWord >> 7) & 0x7;
+	rs2_c = (instWord >> 2) & 0x7;
+    rs2_r = rs2>>3;
+    rd_r =rd>>3;
+
 
 	CI_imm = ((instWord >> 2) & 0x1f) | ((instWord >> 7) & 0x20)|| ((((instWord >> 12)&0x1) ? 0xFFFFFFF0 : 0x0));
 
