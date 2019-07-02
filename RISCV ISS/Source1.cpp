@@ -57,17 +57,17 @@ void ecaller(int regs[32])
 }
 void instDecExecC(unsigned int instWord)
 {
-	unsigned int rd, rs2,funct2 ,funct3, funct4,funct6 ,opcode;
+	unsigned int rd, rs2, funct2, funct3, funct4, funct6, opcode;
 	unsigned int rd_c, rs1_c, rs2_c, rs2_r, rd_r;
 	unsigned int CI_imm, CSS_imm, CIW_imm, CL_imm, CS_imm, CB_imm, CJ_imm;
 
 	opcode = instWord & 0x3;
 	rd = (instWord >> 7) & 0x1f;
 	rs2 = (instWord >> 2) & 0x1f;
-	funct2 =(instWord >> 4) & 0x3;
+	//funct2 = (instWord >> 4) & 0x3;
 	funct3 = (instWord >> 13) & 0x7;
-	funct4 = (instWord >> 12) & 0xf;
-	funct6 = (instWord >> 10) & 0xf;
+	//funct4 = (instWord >> 12) & 0xf;
+	//funct6 = (instWord >> 10) & 0xf;
 	rd_c = (instWord >> 2) & 0x7;
 	rs1_c = (instWord >> 7) & 0x7;
 	rs2_c = (instWord >> 2) & 0x7;
@@ -75,9 +75,9 @@ void instDecExecC(unsigned int instWord)
 	rd_r = rd >> 3;
 
 
-	(signed)CJ_imm = (((instWord >> 3) & 0x7) | ((instWord >> 8) & 0x8) | ((instWord << 2) & 0x10) | ((instWord >> 2) & 0x20) | ((instWord) & 0x40) | ((instWord >> 2) & 0x180) | ((instWord << 1) & 0x200) | ((instWord >> 2) & 0x400)| ((((instWord >> 12) & 0x1) ? 0xFFFFFFF0 : 0x0)))<<1;
-	CI_imm = ((instWord >> 2) & 0x1f) | ((instWord >> 7) & 0x20) || ((((instWord >> 12) & 0x1) ? 0xFFFFFFF0 : 0x0));
-    CB_imm = (instWord>>2&0xf)|(instWord>>7&0x40);
+	CJ_imm = (((instWord >> 3) & 0x7) | ((instWord >> 8) & 0x8) | ((instWord << 2) & 0x10) | ((instWord >> 2) & 0x20) | ((instWord) & 0x40) | ((instWord >> 2) & 0x180) | ((instWord << 1) & 0x200) | ((instWord >> 2) & 0x400) | ((((instWord >> 12) & 0x1) ? 0xFFFFFFF0 : 0x0))) << 1;
+	CI_imm = ((instWord >> 2) & 0x1f) | ((instWord >> 7) & 0x20) | ((((instWord >> 12) & 0x1) ? 0xFFFFFFF0 : 0x0));
+	CB_imm = (((instWord >> 3) & 0x3) | ((instWord >> 8) & 0xc) | ((instWord << 2) & 0x10) | ((instWord) & 0x60) | ((instWord >> 5) & 0x80) | ((((instWord >> 12) & 0x1) ? 0xFFFFFFF0 : 0x0))) << 1;
 
 	if (opcode == 0x1) {
 		switch (funct3)
@@ -108,43 +108,67 @@ void instDecExecC(unsigned int instWord)
 			cout << "\tC.LUI\tx" << dec << rd << ", " << (signed)CI_imm << "\n";
 			regs[rd] = (signed)CI_imm << 12;
 			break;
-		    case 4:
-		        switch(funct2){
-		            case:0
-                        cout << "\tC.SUB\tx" << dec << rd << ", " << rd<<rs2 << "\n";
-		                 regs[rd]=regs[rd]-regs[rs2];
-		                 break;
-		            case:1
-                        cout << "\tC.XOR\tx" << dec << rd << ", " << rd<<rs2 << "\n";
-                        regs[rd]=regs[rd]^regs[rs2];
-                        break;
-		            case: 2
-                        cout << "\tC.OR\tx" << dec << rd << ", " << rd<<rs2 << "\n";
-                        regs[rd]=regs[rd]|regs[rs2];
-                        break;
-		            case 3:
-                        cout << "\tC.AND\tx" << dec << rd << ", " << rd<<rs2 << "\n";
-                        regs[rd]=regs[rd]&regs[rs2];
-                        break;
-                    default:
-                        if(funct6&0x3==0)
-                        {  cout << "\tC.SRLI\tx" << dec << rd << ", " << rd<<","<<CB_imm << "\n";
-                            (unsigned)regs[rd] = (unsigned int)regs[rd] >> CB_imm;}
-                        else{
-                            cout << "\tC.SRAI\tx" << dec << rd << ", " << rd<<","<<CB_imm << "\n";
-                            (signed)regs[rd] = (unsigned int)regs[rd] >> CB_imm;}
-		        }
+		case 4:
+			if (rd_r == 0) {
+				cout << "\tC.SRLI\tx" << dec << rd_c+8 << ", " << (signed)CI_imm << "\n";
+				regs[rd_c+8] = regs[rd_c+8] >> CI_imm;
+				break;
+			}
+			else if (rd_r == 1)
+			{
+				cout << "\tC.SRAI\tx" << dec << rd_c + 8 << ", "  << (signed)CI_imm << "\n";
+				regs[rd_c + 8] = regs[rd_c + 8] >> CI_imm;
+				break;
+			}
+			else if (rd_r == 2)
+			{
+				cout << "\tC.ANDI\tx" << dec << rd_c + 8 << ", "  << (signed)CI_imm << "\n";
+				regs[rd_c + 8] = regs[rd_c + 8] & (signed)CI_imm;
+				break;
+			}
+			else if (rd_r == 4)
+			{
+				switch (rs2_r) {
+				case 0:
+					cout << "\tC.SUB\tx" << dec << rd_c + 8 << ", x" << rs2_c + 8 << "\n";
+					regs[rd_c + 8] = regs[rd_c + 8] - regs[rs2_c + 8];
+					break;
+				case 1:
+					cout << "\tC.XOR\tx" << dec << rd_c + 8 << ", x" << rs2_c + 8 << "\n";
+					regs[rd_c + 8] = regs[rd_c + 8] ^ regs[rs2_c + 8];
+					break;
+				case 2:
+					cout << "\tC.OR\tx" << dec << rd_c + 8 << ", x" << rs2_c + 8 << "\n";
+					regs[rd_c + 8] = regs[rd_c + 8] | regs[rs2_c + 8];
+					break;
+				case 3:
+					cout << "\tC.AND\tx" << dec << rd_c + 8 << ", x" << rs2_c + 8 << "\n";
+					regs[rd_c + 8] = regs[rd_c + 8] & regs[rs2_c + 8];
+					break;
+				}
+			}
 		case 5:
-			cout << "\tC.J\tx" << dec << (signed)CJ_imm << "\n";
+			cout << "\tC.J\t" << dec << (signed)CJ_imm << "\n";
 			pc = pc + (signed)CJ_imm;
 			break;
-
-		default: 
+		case 6:
+			cout << "\tC.BEQZ\tx" << dec <<rd_c+8<< (signed)CB_imm << "\n";
+			if (regs[rd_c + 8] == 0)
+				pc = pc + (signed)CB_imm;
+			break;
+		case 7:
+			cout << "\tC.BNEZ\tx" << dec << rd_c + 8 << (signed)CB_imm << "\n";
+			if (regs[rd_c + 8] != 0)
+				pc = pc + (signed)CB_imm;
+			break;
+		default:
 			cout << "unknown 0 type compressed instruction";
 			break;
+				
+			
 		}
 	}
-	
+
 	else if (opcode == 0x2)
 	{
 		switch (funct3)
@@ -170,7 +194,7 @@ void instDecExecC(unsigned int instWord)
 			}
 			else {
 				if ((rd == 0) && (rs2 == 0)) {
-					cout << "\tC.EBREAK\n"; ?//not yet compleated   ///////////////////////
+					cout << "\tC.EBREAK\n"; //not yet compleated   ///////////////////////
 				}
 				else if (rs2 == 0) {
 					cout << "\tC.JALR\tx" << dec << rd << "\n";
@@ -413,12 +437,12 @@ void instDecExec(unsigned int instWord)
 		regs[rd] = pc + 4;
 		pc = regs[rs1] + (signed)I_imm;
 	}
-	else if (opcode == 0x73)
+	/*else if (opcode == 0x73)
 	{
 		cout << "\tecall\t";
 		ecaller(regs[]);
 
-	}
+	}*/
 	else {
 		cout << "\tUnknown Instruction \n";
 	}
@@ -443,19 +467,20 @@ int main(int argc, char *argv[]) {
 
 		while (true) {
 			regs[0] = 0;//makes sure that the zero reg is always 0
-			instWord = (unsigned char)memory[pc] );
+			instWord = ((unsigned char)memory[pc] );
 			if ((instWord & 0x3) == 0x3)
 			{
 				instWord = instWord | (((unsigned char)memory[pc + 1]) << 8) |
 					(((unsigned char)memory[pc + 2]) << 16) |
 					(((unsigned char)memory[pc + 3]) << 24);
 				pc += 4;
+				instDecExec(instWord);
 			}
 			else
 			{
 				instWord = instWord | (((unsigned char)memory[pc + 1]) << 8);
 				pc += 2;
-				instDecExec(instWord);
+				instDecExecC(instWord);
 			}
 			// remove the following line once you have a complete simulator
 			if (pc > 65) break;		// stop when PC reached address 32 ¡NOTE HAS BEEN EDITED FROM SKELETON TO 64!
