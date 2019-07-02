@@ -30,20 +30,18 @@ void printPrefix(unsigned int instA, unsigned int instW) {
 }
 void ecaller(int regs[32])
 {
-	int a7 = regs[17];
-	int a0 = regs[10];
 	int a1 = regs[11];
 
 	unsigned int address;
-	switch (a7) {
-	case 1: {cout << dec << a0 << endl; break; }
-	case 4: {address = a0;
+	switch (regs[17]) {
+	case 1: {cout << dec << regs[10] << endl; break; }
+	case 4: {address = regs[10];
 		while (memory[address] != '\0')
 		{
 			cout << memory[address]; address++;
 		}
 		break; }
-	case 5: {cin >> a0; break; }
+	case 5: {cin >> regs[10]; break; }
 	case 8: {char* point = &memory[a0];
 		fgets(point, a1, stdin); break; }
 	case 10: {
@@ -440,7 +438,7 @@ void instDecExec(unsigned int instWord)
 	/*else if (opcode == 0x73)
 	{
 		cout << "\tecall\t";
-		ecaller(regs[]);
+		ecaller(regs);
 
 	}*/
 	else {
