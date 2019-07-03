@@ -264,8 +264,8 @@ void instDecExec(unsigned int instWord)
 	B_imm = 2 * (((instWord >> 8) & 0xF) | ((instWord >> 21) & 0x3F0) | ((instWord << 3) & 0x400) | ((instWord >> 20) & 0x800) | (((instWord >> 31) ? 0xFFFFF800 : 0x0)));
 	S_imm = ((instWord >> 7) & 0x1F) | ((instWord >> 20) & 0xFE0) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
 	U_imm = ((instWord) & 0xFFFFF000);
-	//J_imm = ((instWord >> 21) & 0x3FF) | ((instWord >> 10) & 0x400) | ((instWord >> 1) & 0x7F800) | ((instWord >> 12) & 0x80000) | (((instWord >> 31) ? 0xFFF80000 : 0x0));
-    J_imm = ((instWord >> 21) & 0x3FF) | ((instWord >> 10) & 0x400) | (instWord & 0xFF000) | ((instWord >> 11) & 0x100000) /*| (((instWord >> 31) ? 0xFFF80000 : 0x0))*/;
+	J_imm = ((instWord >> 21) & 0x3FF) | ((instWord >> 10) & 0x400) | ((instWord >> 1) & 0x7F800) | ((instWord >> 12) & 0x80000) | (((instWord >> 31) ? 0xFFF80000 : 0x0));
+    // Eyad test J_imm = ((instWord >> 21) & 0x3FF) | ((instWord >> 10) & 0x400) | (instWord & 0xFF000) | ((instWord >> 11) & 0x100000) /*| (((instWord >> 31) ? 0xFFF80000 : 0x0))*/;
 
     printPrefix(instPC, instWord);
 
@@ -411,10 +411,10 @@ void instDecExec(unsigned int instWord)
 			if (regs[rs1] >= regs[rs2]) { pc += (signed int)B_imm;} break;
 		case 4:
 			cout << "\tBLTU\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
-			if ((unsigned int)regs[rs1] < (unsigned int)regs[rs2]) { pc += (signed int)B_imm-4;} break;
+			if ((unsigned int)regs[rs1] < (unsigned int)regs[rs2]) { pc += (signed int)B_imm;} break;
 		case 5:
 			cout << "\tBGEU\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
-			if ((unsigned int)regs[rs1] >= (unsigned int)regs[rs2]) { pc += (signed int)B_imm-4;} break;
+			if ((unsigned int)regs[rs1] >= (unsigned int)regs[rs2]) { pc += (signed int)B_imm;} break;
 		default:cout << "Unknown SB instruction" << endl;
 		}
 	}
