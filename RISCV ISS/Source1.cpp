@@ -109,10 +109,13 @@ void instDecExecC(unsigned int instWord)
 			cout << "\tC.LI\tx" << dec << rd << ", " << (signed)CI_imm << "\n";
 			regs[rd] = (signed)CI_imm;
 			break;
-		case 3:
-			cout << "\tC.LUI\tx" << dec << rd << ", " << (signed)CI_imm << "\n";
+		case 3:if(rd==2)
+            { cout << "\tC.ADDISP16\tx" << dec << rd_c << ", " << CP_16 << "\n";
+                regs[2]=rd_c<<CP_16<<4;break;}
+		    else
+            {cout << "\tC.LUI\tx" << dec << rd << ", " << (signed)CI_imm << "\n";
 			regs[rd] = (signed)CI_imm << 12;
-			break;
+			break;}
 		case 4:
 			if (rd_r == 0) {
 				cout << "\tC.SRLI\tx" << dec << rd_c + 8 << ", " << (signed)CI_imm << "\n";
@@ -169,58 +172,69 @@ void instDecExecC(unsigned int instWord)
 		default:
 			cout << "unknown 0 type compressed instruction";
 			break;
-
-
 		}
 	}
 
 	else if (opcode == 0x2)
 	{
-		switch (funct3)
-		{
-		case 0:
-			cout << "\tC.SLLI\tx" << dec << rd << ", " << (int)CI_imm << "\n";
-			regs[rd] = regs[rd] << (int)CI_imm;
-			break;
-		case 4:
-			if ((instWord >> 12) & 0x1 == 0) {
-				if (rs2 == 0)
-				{
-					cout << "\tC.JR\tx" << dec << 0 << ", x" << rd << "\n";
-					pc = regs[rd];
-					break;
-				}
-				else
-				{
-					cout << "\tC.MV\tx" << dec << rd << ", x" << rs2 << "\n";
-					regs[rd] = regs[rs2];
-					break;
-				}
-			}
-			else {
-				if ((rd == 0) && (rs2 == 0)) {
-					cout << "\tC.EBREAK\n"; //not yet compleated   ///////////////////////
-				}
-				else if (rs2 == 0) {
-					cout << "\tC.JALR\tx" << dec << rd << "\n";
-					regs[1] = pc + 2;
-					pc = rd;
-					break;
-				}
-				else {
-					cout << "\tC.ADD\tx" << dec << rd << ", x" << rs2 << "\n";
-					regs[rd] = regs[rd] + regs[rs2];
-					break;
-				}
-			}
+		switch (funct3) {
+            case 0:
+                cout << "\tC.SLLI\tx" << dec << rd << ", " << (int) CI_imm << "\n";
+                regs[rd] = regs[rd] << (int) CI_imm;
+                break;
+		    case 2:
+                cout << "\tC.LWSP\tx" << dec << rd << ", " << (int) CL_sp_imm << "\n";
+                regs[rd]=regs[2]+CL_sp_imm<<2;break;
 
-		default:
-			break;
+            case 4:
+                if ((instWord >> 12) & 0x1 == 0) {
+                    if (rs2 == 0) {
+                        cout << "\tC.JR\tx" << dec << 0 << ", x" << rd << "\n";
+                        pc = regs[rd];
+                        break;
+                    } else {
+                        cout << "\tC.MV\tx" << dec << rd << ", x" << rs2 << "\n";
+                        regs[rd] = regs[rs2];
+                        break;
+                    }
+                } else {
+                    if ((rd == 0) && (rs2 == 0)) {
+                        //cout << "\tC.EBREAK\n"; //not yet compleated   ///////////////////////
+                    } else if (rs2 == 0) {
+                        cout << "\tC.JALR\tx" << dec << rd << "\n";
+                        regs[1] = pc + 2;
+                        pc = rd;
+                        break;
+                    } else {
+                        cout << "\tC.ADD\tx" << dec << rd << ", x" << rs2 << "\n";
+                        regs[rd] = regs[rd] + regs[rs2];
+                        break;
+                    }
+                }
+            case 6:
+                cout << "\tC.SWSP\tx"<<dec<<rs2<< CS_sp_imm<<"\n";
+                memory[regs[x2]+CS_sp_imm<<2]=rs2;break;
+            default:
+                break;
+        }
+    else
+        switch(funct3)
+            { case 0:cout << "\tC.ADDI4SPN\tx" << dec << rd_c << ", x" << CP_4 << "\n";
+                regs[rd_c]=regs[2]+{CP_4<<2}; break;
+                case 2:
+                    cout << "\tC.LW\tx" << dec << rd_c << ", x" << rs1_c << CLS_imm <<"\n";
+                    regs[rd_c]=rs1_c+{CLS_imm<<2};break;
+                case 6:
+                    cout << "\tC.SW\tx" << dec << rs1_c << ", x" << rs2_c << CLS_imm <<"\n";
+                    regs[rs2_c]=rs1_c+{CLS<<2};break;
+
+                default:
+                    break;
+            }
+
 		}
 	}
 
-
-}
 void instDecExec(unsigned int instWord)
 {
 	unsigned int rd, rs1, rs2, funct3, funct7, opcode;
@@ -292,7 +306,7 @@ void instDecExec(unsigned int instWord)
 			regs[rd] = regs[rs1] & regs[rs2];
 			break;
 		default:
-			cout << "\tUnkown R Instruction \n";
+			cout << "\tUnknown R Instruction \n";
 
 		}
 
@@ -339,7 +353,7 @@ void instDecExec(unsigned int instWord)
 			}
 			break;
 		default:
-			cout << "\tUnkown I Instruction \n";
+			cout << "\tUnknown I Instruction \n";
 		}
 	}
 	else if (opcode == 0x3)  // load instructions
@@ -366,7 +380,7 @@ void instDecExec(unsigned int instWord)
 			regs[rd] = ((memory[regs[rs1] + (signed)I_imm] & 0xff) | ((memory[regs[rs1] + (signed)I_imm + 1] << 8) & 0xff00)) & 0x0000ffff;
 			break;
 		default:
-			cout << "\tUnkown Load Instruction \n";
+			cout << "\tUnknown Load Instruction \n";
 		}
 	}
 	else if (opcode == 0x63)  //SB instructions
@@ -391,7 +405,7 @@ void instDecExec(unsigned int instWord)
 		case 5:
 			cout << "\tBGEU\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
 			if ((unsigned int)regs[rs1] >= (unsigned int)regs[rs2]) { pc += (signed int)B_imm; break; }
-		default:cout << "unknown SB instruction" << endl;
+		default:cout << "Unknown SB instruction" << endl;
 		}
 	}
 	else if (opcode == 0x23)//S instructions
