@@ -458,11 +458,11 @@ void instDecExec(unsigned int instWord)
 		regs[rd] = pc + 4;
 		pc = regs[rs1] + (signed)I_imm;
 	}
-	/*else if (opcode == 0x73)
+	else if (opcode == 0x73)
 	{
 		cout << "\tecall\t";
 		ecaller(regs);
-	}*/
+	}
 	else {
 		cout << "\tUnknown Instruction \n";
 	}
