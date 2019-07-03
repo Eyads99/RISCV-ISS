@@ -42,7 +42,7 @@ void ecaller(int regs[32])
 		}
 		break; }
 	case 5: {cin >> regs[10]; break; }
-	case 8: {char* point = &memory[a0];
+	case 8: {char* point = &memory[regs[10]];
 		fgets(point, a1, stdin); break; }
 	case 10: {
 		for (int i = 0; i < 32; i++)
@@ -76,7 +76,7 @@ void instDecExecC(unsigned int instWord)
 	CJ_imm = (((instWord >> 3) & 0x7) | ((instWord >> 8) & 0x8) | ((instWord << 2) & 0x10) | ((instWord >> 2) & 0x20) | ((instWord) & 0x40) | ((instWord >> 2) & 0x180) | ((instWord << 1) & 0x200) | ((instWord >> 2) & 0x400) | ((((instWord >> 12) & 0x1) ? 0xFFFFFFF0 : 0x0))) << 1;
 	CI_imm = ((instWord >> 2) & 0x1f) | ((instWord >> 7) & 0x20) | ((((instWord >> 12) & 0x1) ? 0xFFFFFFF0 : 0x0));
 	CB_imm = (((instWord >> 3) & 0x3) | ((instWord >> 8) & 0xc) | ((instWord << 2) & 0x10) | ((instWord) & 0x60) | ((instWord >> 5) & 0x80) | ((((instWord >> 12) & 0x1) ? 0xFFFFFFF0 : 0x0))) << 1;
-	CLS_imm = ((((instWord >> 6) & 0x1) | ((instWord >> 9) & 0xE) | ((instWord >> 1) & 10));  // lw,sw   shift left 2
+	CLS_imm = ((((instWord >> 6) & 0x1) | ((instWord >> 9) & 0xE) | ((instWord >> 1) & 10)));  // lw,sw   shift left 2
 	CL_sp_imm = ((instWord >> 4) & 0x7) | ((instWord >> 8) & 0x8) | ((instWord << 2) & 0x30);  // lwsp  shift left 2
 	CS_sp_imm = ((instWord >> 9) & 0xf) | ((instWord >> 3) & 0x30); // swsp   shift left 2
 	CP_16 = ((instWord >> 6) & 0x1) | ((instWord >> 1) & 0x2) | ((instWord >> 3) & 0x4) | ((instWord) & 0x18) | ((instWord >> 7) & 0x20) | ((((instWord >> 12) & 0x1) ? 0xFFFFFFF0 : 0x0));  //addisp16    shift left 4
@@ -111,7 +111,7 @@ void instDecExecC(unsigned int instWord)
 			break;
 		case 3:if(rd==2)
             { cout << "\tC.ADDISP16\tx" << dec << rd_c << ", " << CP_16 << "\n";
-                regs[2]=rd_c<<CP_16<<4;break;}
+                rd_c+=regs[2]+(CP_16<<4);break;}
 		    else
             {cout << "\tC.LUI\tx" << dec << rd << ", " << (signed)CI_imm << "\n";
 			regs[rd] = (signed)CI_imm << 12;
@@ -175,16 +175,16 @@ void instDecExecC(unsigned int instWord)
 		}
 	}
 
-	else if (opcode == 0x2)
-	{
-		switch (funct3) {
+	else if (opcode == 0x2) {
+        switch (funct3) {
             case 0:
                 cout << "\tC.SLLI\tx" << dec << rd << ", " << (int) CI_imm << "\n";
                 regs[rd] = regs[rd] << (int) CI_imm;
                 break;
-		    case 2:
+            case 2:
                 cout << "\tC.LWSP\tx" << dec << rd << ", " << (int) CL_sp_imm << "\n";
-                regs[rd]=regs[2]+CL_sp_imm<<2;break;
+                regs[rd] = regs[2] + (CL_sp_imm << 2);
+                break;
 
             case 4:
                 if ((instWord >> 12) & 0x1 == 0) {
@@ -212,28 +212,30 @@ void instDecExecC(unsigned int instWord)
                     }
                 }
             case 6:
-                cout << "\tC.SWSP\tx"<<dec<<rs2<< CS_sp_imm<<"\n";
-                memory[regs[x2]+CS_sp_imm<<2]=rs2;break;
+                cout << "\tC.SWSP\tx" << dec << rs2 << CS_sp_imm << "\n";
+                memory[regs[2] + (CS_sp_imm << 2)] = rs2;
+                break;
             default:
                 break;
         }
+    }
     else
         switch(funct3)
             { case 0:cout << "\tC.ADDI4SPN\tx" << dec << rd_c << ", x" << CP_4 << "\n";
-                regs[rd_c]=regs[2]+{CP_4<<2}; break;
+                regs[rd_c]=regs[2]+(CP_4<<2); break;
                 case 2:
                     cout << "\tC.LW\tx" << dec << rd_c << ", x" << rs1_c << CLS_imm <<"\n";
-                    regs[rd_c]=rs1_c+{CLS_imm<<2};break;
+                    regs[rd_c]=rs1_c+(CLS_imm<<2);break;
                 case 6:
                     cout << "\tC.SW\tx" << dec << rs1_c << ", x" << rs2_c << CLS_imm <<"\n";
-                    regs[rs2_c]=rs1_c+{CLS<<2};break;
+                    regs[rs2_c]=rs1_c+(CLS_imm<<2);break;
 
                 default:
                     break;
             }
 
-		}
 	}
+//}
 
 void instDecExec(unsigned int instWord)
 {
