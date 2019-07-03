@@ -221,20 +221,25 @@ void instDecExecC(unsigned int instWord)
                 cout << "Unknown 2 type compressed instruction";
         }
     }
-    else
-        switch(funct3)
-            { case 0:cout << "\tC.ADDI4SPN\tx" << dec << rd_c << ", x" << CP_4 << "\n";
-                regs[rd_c]=regs[2]+(CP_4<<2); break;
-                case 2:
-                    cout << "\tC.LW\tx" << dec << rd_c << ", x" << rs1_c << CLS_imm <<"\n";
-                    regs[rd_c]=rs1_c+(CLS_imm<<2);break;
-                case 6:
-                    cout << "\tC.SW\tx" << dec << rs1_c << ", x" << rs2_c << CLS_imm <<"\n";
-                    regs[rs2_c]=rs1_c+(CLS_imm<<2);break;
+    else if(opcode == 0x0){
+        switch(funct3) {
+            case 0:
+                cout << "\tC.ADDI4SPN\tx" << dec << rd_c << ", x" << CP_4 << "\n";
+                regs[rd_c] = regs[2] + (CP_4 << 2);
+                break;
+            case 2:
+                cout << "\tC.LW\tx" << dec << rd_c << ", x" << rs1_c << CLS_imm << "\n";
+                regs[rd_c] = rs1_c + (CLS_imm << 2);
+                break;
+            case 6:
+                cout << "\tC.SW\tx" << dec << rs1_c << ", x" << rs2_c << CLS_imm << "\n";
+                regs[rs2_c] = rs1_c + (CLS_imm << 2);
+                break;
 
-                default:
-                    cout << "Unknown 1 type compressed instruction";
-            }
+            default:
+                cout << "Unknown 0 type compressed instruction";
+        }
+    }
 
 	}
 //}
@@ -259,8 +264,10 @@ void instDecExec(unsigned int instWord)
 	B_imm = 2 * (((instWord >> 8) & 0xF) | ((instWord >> 21) & 0x3F0) | ((instWord << 3) & 0x400) | ((instWord >> 20) & 0x800) | (((instWord >> 31) ? 0xFFFFF800 : 0x0)));
 	S_imm = ((instWord >> 7) & 0x1F) | ((instWord >> 20) & 0xFE0) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
 	U_imm = ((instWord) & 0xFFFFF000);
-	J_imm = ((instWord >> 21) & 0x3FF) | ((instWord >> 10) & 0x400) | ((instWord >> 1) & 0x7F800) | ((instWord >> 12) & 0x80000) | (((instWord >> 31) ? 0xFFF80000 : 0x0));
-	printPrefix(instPC, instWord);
+	//J_imm = ((instWord >> 21) & 0x3FF) | ((instWord >> 10) & 0x400) | ((instWord >> 1) & 0x7F800) | ((instWord >> 12) & 0x80000) | (((instWord >> 31) ? 0xFFF80000 : 0x0));
+    J_imm = ((instWord >> 21) & 0x3FF) | ((instWord >> 10) & 0x400) | (instWord & 0xFF000) | ((instWord >> 11) & 0x100000) /*| (((instWord >> 31) ? 0xFFF80000 : 0x0))*/;
+
+    printPrefix(instPC, instWord);
 
 	if (opcode == 0x33) {		// R Instructions
 		switch (funct3) {
