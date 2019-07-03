@@ -82,7 +82,7 @@ void instDecExecC(unsigned int instWord)
 	CS_sp_imm = ((instWord >> 9) & 0xf) | ((instWord >> 3) & 0x30); // swsp   shift left 2
 	CP_16 = ((instWord >> 6) & 0x1) | ((instWord >> 1) & 0x2) | ((instWord >> 3) & 0x4) | ((instWord) & 0x18) | ((instWord >> 7) & 0x20) | ((((instWord >> 12) & 0x1) ? 0xFFFFFFF0 : 0x0));  //addisp16    shift left 4
 	CP_4 = ((instWord >> 6) & 0x1) | ((instWord >> 4) & 0x2) | ((instWord >> 9) & 0xc) | ((instWord >> 3) & 0xf0);  //addisp4    shift left 2
-
+    printPrefix(instPC, instWord);
 
 
 	if (opcode == 0x1) {
@@ -171,7 +171,7 @@ void instDecExecC(unsigned int instWord)
 				pc = pc + (signed)CB_imm;
 			break;
 		default:
-			cout << "unknown 0 type compressed instruction";
+			cout << "Unknown 1 type compressed instruction";
 			break;
 		}
 	}
@@ -200,7 +200,7 @@ void instDecExecC(unsigned int instWord)
                     }
                 } else {
                     if ((rd == 0) && (rs2 == 0)) {
-                        //cout << "\tC.EBREAK\n"; //not yet compleated   ///////////////////////
+                        //cout << "\tC.EBREAK\n"; //not yet completed
                     } else if (rs2 == 0) {
                         cout << "\tC.JALR\tx" << dec << rd << "\n";
                         regs[1] = pc + 2;
@@ -217,7 +217,7 @@ void instDecExecC(unsigned int instWord)
                 memory[regs[2] + (CS_sp_imm << 2)] = rs2;
                 break;
             default:
-                break;
+                cout << "Unknown 2 type compressed instruction";
         }
     }
     else
@@ -232,7 +232,7 @@ void instDecExecC(unsigned int instWord)
                     regs[rs2_c]=rs1_c+(CLS_imm<<2);break;
 
                 default:
-                    break;
+                    cout << "Unknown 1 type compressed instruction";
             }
 
 	}
@@ -388,7 +388,6 @@ void instDecExec(unsigned int instWord)
 	}
 	else if (opcode == 0x63)  //SB instructions
 	{
-
 		switch (funct3) {
 		case 0:
 			cout << "\tBEQ\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
@@ -423,7 +422,6 @@ void instDecExec(unsigned int instWord)
 
 			memory[regs[rs1] + (signed)S_imm] = regs[rs1] & 0xff;
 			memory[regs[rs1] + (signed)S_imm + 1] = (regs[rs2] >> 8) & 0xff;
-
 			break;
 		case 2:
 			cout << "\tSW\tx" << dec << rs2 << ", " << (signed)S_imm << "(x" << rs1 << ")" << "\n";
