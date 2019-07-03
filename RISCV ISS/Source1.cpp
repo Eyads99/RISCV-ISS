@@ -45,6 +45,7 @@ void ecaller(int regs[32])
 	case 8: {char* point = &memory[regs[10]];
 		fgets(point, a1, stdin); break; }
 	case 10: {
+	    cout<<"\n";
 		for (int i = 0; i < 32; i++)
 			cout << "x" << dec << i << ": \t" << "0x" << hex << std::setfill('0') << std::setw(8) << regs[i] << "\n";//dumping regs
 		exit(0);
@@ -460,7 +461,7 @@ void instDecExec(unsigned int instWord)
 	}
 	else if (opcode == 0x73)
 	{
-		cout << "\tecall\t";
+		cout << "\tECALL\t";
 		ecaller(regs);
 	}
 	else {
