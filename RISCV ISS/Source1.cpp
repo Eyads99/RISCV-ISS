@@ -59,6 +59,7 @@ void instDecExecC(unsigned int instWord)
 	unsigned int rd, rs2, funct2, funct3, funct4, funct6, opcode;
 	unsigned int rd_c, rs1_c, rs2_c, rs2_r, rd_r;
 	unsigned int CI_imm, CL_sp_imm, CIW_imm, CLS_imm, CS_sp_imm, CB_imm, CJ_imm,CP_16,CP_4;
+    unsigned int instPC = pc - 4;
 
 	opcode = instWord & 0x3;
 	rd = (instWord >> 7) & 0x1f;
@@ -325,7 +326,7 @@ void instDecExec(unsigned int instWord)
 			break;
 		case 3:
 			cout << "\tSLTIU\tx" << dec << rd << ", x" << rs1 << ", " << (int)I_imm << "\n";
-			if ((unsigned)regs[rs1] < (unsigned)I_imm)regs[rd] = 1; else regs[rd] = 0;
+			if ((unsigned)regs[rs1] < (unsigned)I_imm) regs[rd] = 1; else regs[rd] = 0;
 			break;
 		case 4:
 			cout << "\tXORI\tx" << dec << rd << ", x" << rs1 << ", " << (int)I_imm << "\n";
@@ -391,22 +392,22 @@ void instDecExec(unsigned int instWord)
 		switch (funct3) {
 		case 0:
 			cout << "\tBEQ\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
-			if (regs[rs1] == regs[rs2]) { pc += (signed int)B_imm; break; }
+			if (regs[rs1] == regs[rs2]) { pc += (signed int)B_imm;} break;
 		case 1:
 			cout << "\tBNE\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
-			if (regs[rs1] != regs[rs2]) { pc += (signed int)B_imm; break; }
+			if (regs[rs1] != regs[rs2]) { pc += (signed int)B_imm;} break;
 		case 2:
 			cout << "\tBLT\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
-			if (regs[rs1] < regs[rs2]) { pc += (signed int)B_imm; break; }
+			if (regs[rs1] < regs[rs2]) { pc += (signed int)B_imm;} break;
 		case 3:
 			cout << "\tBGE\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
-			if (regs[rs1] >= regs[rs2]) { pc += (signed int)B_imm; break; }
+			if (regs[rs1] >= regs[rs2]) { pc += (signed int)B_imm;} break;
 		case 4:
 			cout << "\tBLTU\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
-			if ((unsigned int)regs[rs1] < (unsigned int)regs[rs2]) { pc += (signed int)B_imm; break; }
+			if ((unsigned int)regs[rs1] < (unsigned int)regs[rs2]) { pc += (signed int)B_imm-4;} break;
 		case 5:
 			cout << "\tBGEU\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
-			if ((unsigned int)regs[rs1] >= (unsigned int)regs[rs2]) { pc += (signed int)B_imm; break; }
+			if ((unsigned int)regs[rs1] >= (unsigned int)regs[rs2]) { pc += (signed int)B_imm-4;} break;
 		default:cout << "Unknown SB instruction" << endl;
 		}
 	}
@@ -449,7 +450,7 @@ void instDecExec(unsigned int instWord)
 	{
 		cout << "\tJAL\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)J_imm << "\n";
 		regs[rd] = pc + 4;
-		pc = pc + J_imm;
+		pc = pc + (signed)J_imm;
 	}
 	else if (opcode == 0x67)//JALR
 	{
