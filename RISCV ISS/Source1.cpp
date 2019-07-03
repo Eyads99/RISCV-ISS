@@ -49,7 +49,7 @@ void ecaller(int regs[32])
 			cout << "x" << dec << i << ": \t" << "0x" << hex << std::setfill('0') << std::setw(8) << regs[i] << "\n";//dumping regs
 		exit(0);
 	}
-	default:cout << "Unknown Ecall service";
+	default:cout << "Unknown Ecall service\n";
 	}
 
 }
@@ -503,7 +503,7 @@ int main(int argc, char *argv[]) {
 				instDecExecC(instWord);
 			}
 			// remove the following line once you have a complete simulator
-			if (pc > 65) break;		// stop when PC reached address 32 ¡NOTE HAS BEEN EDITED FROM SKELETON TO 64!
+			//if (pc > 65) break;		// stop when PC reached address 32 ¡Has been disabled as ecaller should work!
 
 		}
 
