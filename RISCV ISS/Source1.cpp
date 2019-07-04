@@ -31,10 +31,9 @@ void printPrefix(unsigned int instA, unsigned int instW) {
 void ecaller(int regs[32])
 {
 	int a1 = regs[11];
-
 	unsigned int address;
 	switch (regs[17]) {
-	case 1: {cout<<"\n" << dec << regs[10] << endl; break; }
+	case 1: {cout<< dec << regs[10] << endl; break; }
 	case 4: {address = regs[10];
 		while (memory[address] != '\0')
 		{
@@ -411,19 +410,19 @@ void instDecExec(unsigned int instWord)
 		case 1:
 			cout << "\tBNE\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
 			if (regs[rs1] != regs[rs2]) { pc += (signed int)B_imm-4; } break;//////////////////////////
-		case 2:
+		case 4: //2
 			cout << "\tBLT\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
 			if (regs[rs1] < regs[rs2]) { pc += (signed int)B_imm-4;} break;//////////////
-		case 3:
+		case 5: //3
 			cout << "\tBGE\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
 			if (regs[rs1] >= regs[rs2]) { pc += (signed int)B_imm-4;} break;////////////////
-		case 4:
+		case 6://4
 			cout << "\tBLTU\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
 			if ((unsigned int)regs[rs1] < (unsigned int)regs[rs2]) { pc += (signed int)B_imm-4; } break;////////////////
-		case 5:
+		case 7://5
 			cout << "\tBGEU\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
 			if ((unsigned int)regs[rs1] >= (unsigned int)regs[rs2]) { pc += (signed int)B_imm-4; } break;////////
-		default:cout << "Unknown SB instruction" << endl;
+		default:cout << "\tUnknown SB instruction\n";
 		}
 	}
 	else if (opcode == 0x23)//S instructions
@@ -475,7 +474,7 @@ void instDecExec(unsigned int instWord)
 	}
 	else if (opcode == 0x73)
 	{
-		cout << "\tECALL\t";
+		cout << "\tECALL\n";
 		ecaller(regs);
 
 	}
