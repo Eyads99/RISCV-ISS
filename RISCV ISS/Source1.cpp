@@ -518,7 +518,7 @@ int main(int argc, char *argv[]) {
 				instDecExecC(instWord);
 			}
 			// remove the following line once you have a complete simulator
-			//if (pc > 65) break;		// stop when PC reached address 32 ¡Has been disabled as ecaller should work!
+			//if (pc > 65) break;		// stop when PC reached address 32 Has been disabled as ecaller should work!
 
 		}
 
