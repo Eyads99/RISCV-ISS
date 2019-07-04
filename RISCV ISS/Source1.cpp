@@ -465,18 +465,47 @@ void instDecExec(unsigned int instWord)
 	{
 		cout << "\tJAL\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)J_imm << "\n";
 		regs[rd] = pc + 4;
-		pc = pc + (signed)J_imm;
+		pc = pc + (signed)J_imm-4;
 	}
 	else if (opcode == 0x67)//JALR
 	{
 		cout << "\tJALR\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
 		regs[rd] = pc + 4;
-		pc = regs[rs1] + (signed)I_imm;
+		pc = regs[rs1] + (signed)I_imm-4;//-4 added
 	}
 	else if (opcode == 0x73)
 	{
 		cout << "\tECALL\t";
-		ecaller(regs);
+		//ecaller(regs);
+
+
+
+        int a1 = regs[11];
+
+        unsigned int address;
+        switch (regs[17]) {
+            case 1: {cout << dec << regs[10] << endl; break; }
+            case 4: {address = regs[10];
+                while (memory[address] != '\0')
+                {
+                    cout << memory[address]; address++;
+                }
+                break; }
+            case 5: {cin >> regs[10]; break; }
+            case 8: {char* point = &memory[regs[10]];
+                fgets(point, a1, stdin); break; }
+            case 10: {
+                cout << "\n";
+                for (int i = 0; i < 32; i++)
+                    cout << "x" << dec << i << ": \t" << "0x" << hex << std::setfill('0') << std::setw(8) << regs[i] << "\n";//dumping regs
+                exit(0);
+            }
+            default:cout << "Unknown Ecall service\n";
+        }
+
+
+
+
 	}
 	else {
 		cout << "\tUnknown Instruction \n";
