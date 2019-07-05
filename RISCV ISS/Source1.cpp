@@ -73,11 +73,19 @@ void instDecExecC(unsigned int instWord)
 	rs2_r = rs2 >> 3;
 	rd_r = rd >> 3;
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//CJ_imm = (((instWord >> 3) & 0x7) | ((instWord >> 8) & 0x8) | ((instWord << 2) & 0x10) | ((instWord >> 2) & 0x20) | ((instWord) & 0x40) | ((instWord >> 2) & 0x180) | ((instWord << 1) & 0x200) | ((instWord >> 2) & 0x400) | ((((instWord >> 12) & 0x1) ? 0xFFFFFFF0 : 0x0))) << 1;
+      CJ_imm = (((instWord >> 3) & 0x7) | ((instWord >> 8) & 0x8) | ((instWord >> 2) & 0x1 ) | ((instWord >> 2) & 0x20) | ((instWord) & 0x40) | ((instWord >> 2) & 0x180) | ((instWord     ) & 0x200) | ((instWord >> 2) & 0x400) | ((((instWord >> 12) & 0x1) ? 0xFFFFFFF0 : 0x0))) << 1;
 
-	CJ_imm = (((instWord >> 3) & 0x7) | ((instWord >> 8) & 0x8) | ((instWord << 2) & 0x10) | ((instWord >> 2) & 0x20) | ((instWord) & 0x40) | ((instWord >> 2) & 0x180) | ((instWord << 1) & 0x200) | ((instWord >> 2) & 0x400) | ((((instWord >> 12) & 0x1) ? 0xFFFFFFF0 : 0x0))) << 1;
-	CI_imm = ((instWord >> 2) & 0x1f) | ((instWord >> 7) & 0x20) | ((((instWord >> 12) & 0x1) ? 0xFFFFFFF0 : 0x0));
-	CB_imm = (((instWord >> 3) & 0x3) | ((instWord >> 8) & 0xc) | ((instWord << 2) & 0x10) | ((instWord) & 0x60) | ((instWord >> 5) & 0x80) | ((((instWord >> 12) & 0x1) ? 0xFFFFFFF0 : 0x0))) << 1;
-	CLS_imm = ((((instWord >> 6) & 0x1) | ((instWord >> 9) & 0xE) | ((instWord >> 1) & 10)));  // lw,sw   shift left 2
+      ////////////////////////////////////////////////////////////////
+      //CI_imm = ((instWord >> 2) & 0x1f) | ((instWord >> 7) & 0x20) | ((((instWord >> 12) & 0x1) ? 0xFFFFFFF0 : 0x0));
+        CI_imm = ((instWord >> 2) & 0x1f) | ((instWord >> 7) & 0x10) | ((((instWord >> 12) & 0x1) ? 0xFFFFFFF0 : 0x0));
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      //CB_imm = (((instWord >> 3) & 0x3) | ((instWord >> 8) & 0xc ) | ((instWord << 2) & 0x10) | ((instWord) & 0x60) | ((instWord >> 5) & 0x80) | ((((instWord >> 12) & 0x1) ? 0xFFFFFFF0 : 0x0))) << 1;
+        CB_imm = (((instWord >> 3) & 0x3) | ((instWord >> 8) & 0xc ) | ((instWord >> 2) & 0x1 ) | ((instWord) & 0x60) | ((instWord >> 5) & 0x80) | ((((instWord >> 12) & 0x1) ? 0xFFFFFFF0 : 0x0))) << 1;
+
+
+        CLS_imm = ((((instWord >> 6) & 0x1) | ((instWord >> 9) & 0xE) | ((instWord >> 1) & 10)));  // lw,sw   shift left 2
 	CL_sp_imm = ((instWord >> 4) & 0x7) | ((instWord >> 8) & 0x8) | ((instWord << 2) & 0x30);  // lwsp  shift left 2
 	CS_sp_imm = ((instWord >> 9) & 0xf) | ((instWord >> 3) & 0x30); // swsp   shift left 2
 	CP_16 = ((instWord >> 6) & 0x1) | ((instWord >> 1) & 0x2) | ((instWord >> 3) & 0x4) | ((instWord) & 0x18) | ((instWord >> 7) & 0x20) | ((((instWord >> 12) & 0x1) ? 0xFFFFFFF0 : 0x0));  //addisp16    shift left 4
@@ -206,7 +214,7 @@ void instDecExecC(unsigned int instWord)
 			}
 			else {
 				if ((rd == 0) && (rs2 == 0)) {
-					//cout << "\tC.EBREAK\n"; //not yet completed
+					//cout << "\tC.EBREAK\n"; //not implemented
 				}
 				else if (rs2 == 0) {
 					cout << "\tC.JALR\tx" << dec << rd << "\n";
@@ -522,8 +530,8 @@ int main(int argc, char *argv[]) {
 		}
 
 		// dump the registers
-		for (int i = 0; i < 32; i++)
-			cout << "x" << dec << i << ": \t" << "0x" << hex << std::setfill('0') << std::setw(8) << regs[i] << "\n";
+		//for (int i = 0; i < 32; i++)
+		//	cout << "x" << dec << i << ": \t" << "0x" << hex << std::setfill('0') << std::setw(8) << regs[i] << "\n";
 
 	}
 	else emitError((char*)"Cannot access input file\n"); return 0;
