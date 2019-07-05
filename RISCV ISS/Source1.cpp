@@ -255,7 +255,7 @@ void instDecExecC(unsigned int instWord)
 			memory[regs[rs1_c] + (signed)CLS_imm + 2] = (regs[rs2_c] >> 16) & 0xff;
 			memory[regs[rs1_c] + (signed)CLS_imm + 3] = (regs[rs2_c] >> 24) & 0xff;
 		default:
-			cout << "Unknown 0 type compressed instruction";
+			cout << "\tUnknown 0 type compressed instruction\n";
 		}
 	}
 
