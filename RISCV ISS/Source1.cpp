@@ -100,6 +100,7 @@ void instDecExecC(unsigned int instWord)
 			if (rd == 0)
 			{
 				cout << "\tC.NOP\tx" << dec << rd << ", " << 0 << "\n";
+				regs[0]+= regs[0]//useless in practice but this is what the NOP instruction does
 				break;
 			}
 			else
@@ -244,12 +245,15 @@ void instDecExecC(unsigned int instWord)
 			break;
 		case 2:
 			cout << "\tC.LW\tx" << dec << rd_c << ", x" << rs1_c << CLS_imm << "\n";
-			regs[rd_c] = rs1_c + (CLS_imm << 2);
+			//regs[rd_c] = rs1_c + (CLS_imm << 2);
+			regs[rd_c] = ((memory[regs[rs1_c] + (signed)CLS_imm] & 0xff) | ((memory[regs[rs1_c] + (signed)CLS_imm + 1] << 8) & 0xff00) | ((memory[regs[rs1_c] + (signed)CLS_imm + 2] << 16) & 0xff0000) | ((memory[regs[rs1_c] + (signed)CLS_imm + 3] << 24) & 0xff000000));
 			break;
 		case 6:
-			cout << "\tC.SW\tx" << dec << rs1_c << ", x" << rs2_c << CLS_imm << "\n";
-			regs[rs2_c] = rs1_c + (CLS_imm << 2);
-			break;
+            cout << "\tC.SW\tx" << dec << rs2_c << ", " << (signed)CLS_imm << "(x" << rs1_c << ")" << "\n"
+                memory[regs[rs1] + (signed)S_imm] = regs[rs1] & 0xff;
+                memory[regs[rs1] + (signed)S_imm + 1] = (regs[rs2] >> 8) & 0xff;
+                memory[regs[rs1] + (signed)S_imm + 2] = (regs[rs2] >> 16) & 0xff;
+                memory[regs[rs1] + (signed)S_imm + 3] = (regs[rs2] >> 24) & 0xff;
 
 		default:
 			cout << "Unknown 0 type compressed instruction";
