@@ -110,9 +110,9 @@ void instDecExecC(unsigned int instWord)
 				break;
 			}
 		case 1:
-			cout << "\tC.JAL\tx" << dec << (signed)CJ_imm << "\n";
-			regs[1] = pc + 2;
-			pc = pc + (signed)CJ_imm;
+			cout << "\tC.JAL\t" << dec << (signed)CJ_imm << "\n";
+			regs[1] = pc ;
+			pc = pc + (signed)CJ_imm-2;
 			break;
 
 		case 2:
@@ -171,17 +171,17 @@ void instDecExecC(unsigned int instWord)
 			}
 		case 5:
 			cout << "\tC.J\t" << dec << (signed)CJ_imm << "\n";
-			pc = pc + (signed)CJ_imm-4;
+			pc = pc + (signed)CJ_imm-2;
 			break;
 		case 6:
 			cout << "\tC.BEQZ\tx" << dec << rd_c + 8 << (signed)CB_imm << "\n";
 			if (regs[rd_c + 8] == 0)
-				pc = pc + (signed)CB_imm-4;
+				pc = pc + (signed)CB_imm-2;
 			break;
 		case 7:
 			cout << "\tC.BNEZ\tx" << dec << rd_c + 8 << (signed)CB_imm << "\n";
 			if (regs[rd_c + 8] != 0)
-				pc = pc + (signed)CB_imm-4;
+				pc = pc + (signed)CB_imm-2;
 			break;
 		default:
 			cout << "Unknown 1 type compressed instruction";
