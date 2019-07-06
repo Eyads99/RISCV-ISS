@@ -154,7 +154,6 @@ void instDecExecC(unsigned int instWord)
 				}
 			}
 		case 5:
-
 			pc = pc + (signed)CJ_imm - 2;
                 cout << "\tC.J\t" <<hex <<"0x" << pc<< "\n";
 			break;
@@ -184,7 +183,6 @@ void instDecExecC(unsigned int instWord)
 			cout << "\tC.LWSP\tx" << dec << rd << ", " << (int)CL_sp_imm << "\n";
 			regs[rd] = regs[2] + (CL_sp_imm << 2);
 			break;
-
 		case 4:
 			if (((instWord >> 12) & 0x1) == 0) {
 				if (rs2 == 0) {
@@ -242,7 +240,6 @@ void instDecExecC(unsigned int instWord)
 			cout << "\tUnknown 0 type compressed instruction\n";
 		}
 	}
-
 }
 
 void instDecExec(unsigned int instWord)
@@ -399,7 +396,7 @@ void instDecExec(unsigned int instWord)
 			if (regs[rs1] == regs[rs2]) { pc += (signed int)B_imm - 4; } break;
 		case 1:
 			cout << "\tBNE\tx" << dec << rs1 << ", x" << dec << rs2 << ", " << hex << "0x" << pc+(signed int)B_imm - 4 << "\n";
-			if (regs[rs1] != regs[rs2]) { pc += (signed int)B_imm - 4; } break;/
+			if (regs[rs1] != regs[rs2]) { pc += (signed int)B_imm - 4; } break;
 		case 4:
 			cout << "\tBLT\tx" << dec << rs1 << ", x" << dec << rs2 << ", " << hex << "0x" << pc+(signed int)B_imm - 4 << "\n";
 			if (regs[rs1] < regs[rs2]) { pc += (signed int)B_imm - 4; } break;
