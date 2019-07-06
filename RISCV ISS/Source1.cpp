@@ -1,7 +1,4 @@
-/*  This is just a skeleton. It DOES NOT implement all the requirements.
-	It only recognizes the "ADD", "SUB" and "ADDI"instructions and prints
-	"Unknown Instruction" for all other instructions!
-	References:
+/*  	References:
 	(1) The risc-v ISA Manual ver. 2.1 @ https://riscv.org/specifications/
 	(2) https://github.com/michaeljclark/riscv-meta/blob/master/meta/opcodes
 */
@@ -37,6 +34,7 @@ void ecaller(int regs[32])
 		{
 			cout << memory[address]; address++;
 		}
+		cout<<"\n"; 
 		break; }
 	case 5: {cin >> regs[10]; break; }
 	case 8: {char* point = &memory[regs[10]];
