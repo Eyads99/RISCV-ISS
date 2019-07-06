@@ -1,12 +1,10 @@
-/*
-	This is just a skeleton. It DOES NOT implement all the requirements.
+/*  This is just a skeleton. It DOES NOT implement all the requirements.
 	It only recognizes the "ADD", "SUB" and "ADDI"instructions and prints
 	"Unknown Instruction" for all other instructions!
 	References:
 	(1) The risc-v ISA Manual ver. 2.1 @ https://riscv.org/specifications/
 	(2) https://github.com/michaeljclark/riscv-meta/blob/master/meta/opcodes
 */
-
 #include <iostream>
 #include <fstream>
 #include "stdlib.h"
@@ -51,7 +49,6 @@ void ecaller(int regs[32])
 	}
 	default:cout << "Unknown Ecall service\n";
 	}
-
 }
 void instDecExecC(unsigned int instWord)
 {
@@ -63,35 +60,22 @@ void instDecExecC(unsigned int instWord)
 	opcode = instWord & 0x3;
 	rd = (instWord >> 7) & 0x1f;
 	rs2 = (instWord >> 2) & 0x1f;
-	//funct2 = (instWord >> 4) & 0x3;
 	funct3 = (instWord >> 13) & 0x7;
-	//funct4 = (instWord >> 12) & 0xf;
-	//funct6 = (instWord >> 10) & 0xf;
 	rd_c = (instWord >> 2) & 0x7;
 	rs1_c = (instWord >> 7) & 0x7;
 	rs2_c = (instWord >> 2) & 0x7;
 	rs2_r = rs2 >> 3;
 	rd_r = rd >> 3;
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	CJ_imm = (((instWord >> 3) & 0x7) | ((instWord >> 8) & 0x8) | ((instWord << 2) & 0x10) | ((instWord >> 2) & 0x20) | ((instWord) & 0x40) | ((instWord >> 2) & 0x180) | ((instWord << 1) & 0x200) | ((instWord >> 2) & 0x400) | ((((instWord >> 12) & 0x1) ? 0xFFFFF800 : 0x0))) << 1; //fixed
-	//CJ_imm = (((instWord >> 3) & 0x7) | ((instWord >> 8) & 0x8) | ((instWord >> 2) & 0x1) | ((instWord >> 2) & 0x20) | ((instWord) & 0x40) | ((instWord >> 2) & 0x180) | ((instWord) & 0x200) | ((instWord >> 2) & 0x400) | ((((instWord >> 12) & 0x1) ? 0xFFFFFFF0 : 0x0))) << 1;
-
-	////////////////////////////////////////////////////////////////
 	CI_imm = ((instWord >> 2) & 0x1f) | ((instWord >> 7) & 0x20) | ((((instWord >> 12) & 0x1) ? 0xFFFFFFF0 : 0x0));  // fixed
-	//CI_imm = ((instWord >> 2) & 0x1f) | ((instWord >> 7) & 0x10) | ((((instWord >> 12) & 0x1) ? 0xFFFFFFF0 : 0x0));
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	CB_imm = (((instWord >> 3) & 0x3) | ((instWord >> 8) & 0xc) | ((instWord << 2) & 0x10) | ((instWord) & 0x60) | ((instWord >> 5) & 0x80) | ((((instWord >> 12) & 0x1) ? 0xFFFFFF00 : 0x0))) << 1;  // fixed
-	  //CB_imm = (((instWord >> 3) & 0x3) | ((instWord >> 8) & 0xc) | ((instWord >> 2) & 0x1) | ((instWord) & 0x60) | ((instWord >> 5) & 0x80) | ((((instWord >> 12) & 0x1) ? 0xFFFFFF00 : 0x0))) << 1;
-
-
 	CLS_imm = ((((instWord >> 6) & 0x1) | ((instWord >> 9) & 0xE) | ((instWord >> 1) & 10)));  // lw,sw   shift left 2
 	CL_sp_imm = ((instWord >> 4) & 0x7) | ((instWord >> 9) & 0x8) | ((instWord << 2) & 0x30);  // lwsp  shift left 2   //fixed
 	CS_sp_imm = ((instWord >> 9) & 0xf) | ((instWord >> 3) & 0x30); // swsp   shift left 2
 	CP_16 = ((instWord >> 6) & 0x1) | ((instWord >> 1) & 0x2) | ((instWord >> 3) & 0x4) | ((instWord) & 0x18) | ((instWord >> 7) & 0x20) | ((((instWord >> 12) & 0x1) ? 0xFFFFFFE0 : 0x0));  //addisp16    shift left 4    // fixed
 	CP_4 = ((instWord >> 6) & 0x1) | ((instWord >> 4) & 0x2) | ((instWord >> 9) & 0xc) | ((instWord >> 3) & 0xf0);  //addisp4    shift left 2
 	printPrefix(instPC, instWord);
-
 
 	if (opcode == 0x1) {
 		switch (funct3)
@@ -110,7 +94,7 @@ void instDecExecC(unsigned int instWord)
 				break;
 			}
 		case 1:
-			cout << "\tC.JAL\t" << dec << (signed)CJ_imm << "\n";
+			cout << "\tC.JAL\t" << hex<<"0x" << pc + (signed)CJ_imm - 2 << "\n";
 			regs[1] = pc;
 			pc = pc + (signed)CJ_imm - 2;
 			break;
@@ -170,16 +154,17 @@ void instDecExecC(unsigned int instWord)
 				}
 			}
 		case 5:
-			cout << "\tC.J\t" << dec << (signed)CJ_imm << "\n";
+
 			pc = pc + (signed)CJ_imm - 2;
+                cout << "\tC.J\t" <<hex <<"0x" << pc<< "\n";
 			break;
 		case 6:
-			cout << "\tC.BEQZ\tx" << dec << rd_c + 8 << (signed)CB_imm << "\n";
+			cout << "\tC.BEQZ\tx" << dec << rs1_c + 8 <<", 0x"<<hex<< (signed)CB_imm << "\n";
 			if (regs[rd_c + 8] == 0)
 				pc = pc + (signed)CB_imm - 2;
 			break;
 		case 7:
-			cout << "\tC.BNEZ\tx" << dec << rd_c + 8 << (signed)CB_imm << "\n";
+			cout << "\tC.BNEZ\tx" << dec << rs1_c + 8 <<", 0x"<<hex<< (signed)CB_imm << "\n";
 			if (regs[rd_c + 8] /*!= 0*/)
 				pc = pc + (signed)CB_imm - 2;
 			break;
@@ -203,7 +188,7 @@ void instDecExecC(unsigned int instWord)
 		case 4:
 			if (((instWord >> 12) & 0x1) == 0) {
 				if (rs2 == 0) {
-					cout << "\tC.JR\tx" << dec << 0 << ", x" << rd << "\n";
+					cout << "\tC.JR\tx" << dec  << rd << "\n";
 					pc = regs[rd];
 					break;
 				}
@@ -215,11 +200,11 @@ void instDecExecC(unsigned int instWord)
 			}
 			else {
 				if ((rd == 0) && (rs2 == 0)) {
-					//cout << "\tC.EBREAK NOT IMPLEMENTED\n"; //not implemented
+					//cout << "\tC.EBREAK NOT IMPLEMENTED\n";
 				}
 				else if (rs2 == 0) {
 					cout << "\tC.JALR\tx" << dec << rd << "\n";
-					regs[1] = pc ;//+2;
+					regs[1] = pc ;
 					pc = regs[rd];
 					break;
 				}
@@ -245,7 +230,6 @@ void instDecExecC(unsigned int instWord)
 			break;
 		case 2:
 			cout << "\tC.LW\tx" << dec << rd_c << ", x" << rs1_c << CLS_imm << "\n";
-			//regs[rd_c] = rs1_c + (CLS_imm << 2);
 			regs[rd_c] = ((memory[regs[rs1_c] + (signed)CLS_imm] & 0xff) | ((memory[regs[rs1_c] + (signed)CLS_imm + 1] << 8) & 0xff00) | ((memory[regs[rs1_c] + (signed)CLS_imm + 2] << 16) & 0xff0000) | ((memory[regs[rs1_c] + (signed)CLS_imm + 3] << 24) & 0xff000000));
 			break;
 		case 6:
@@ -260,14 +244,12 @@ void instDecExecC(unsigned int instWord)
 	}
 
 }
-//}
 
 void instDecExec(unsigned int instWord)
 {
 	unsigned int rd, rs1, rs2, funct3, funct7, opcode;
 	unsigned int I_imm, S_imm, B_imm, U_imm, J_imm;
 	unsigned int address;
-
 	unsigned int instPC = pc - 4;
 
 	opcode = instWord & 0x0000007F;
@@ -277,7 +259,6 @@ void instDecExec(unsigned int instWord)
 	rs2 = (instWord >> 20) & 0x0000001F;
 	funct7 = (instWord >> 25) & 0x0000007F;
 
-	// â€” inst[31] â€” inst[30:25] inst[24:21] inst[20]
 	I_imm = ((instWord >> 20) & 0x7FF) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
 	B_imm = (((instWord >> 8) & 0xF) | ((instWord >> 21) & 0x3F0) | ((instWord << 3) & 0x400) | ((instWord >> 20) & 0x800) | (((instWord >> 31) ? 0xFFFFF800 : 0x0))) << 1;
 	S_imm = ((instWord >> 7) & 0x1F) | ((instWord >> 20) & 0xFE0) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
@@ -337,7 +318,6 @@ void instDecExec(unsigned int instWord)
 			cout << "\tUnknown R Instruction \n";
 
 		}
-
 	}
 	else if (opcode == 0x13) {	// I instructions
 		switch (funct3) {
@@ -415,23 +395,23 @@ void instDecExec(unsigned int instWord)
 	{
 		switch (funct3) {
 		case 0:
-			cout << "\tBEQ\tx" << dec << rs1 << ", x" << dec << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
-			if (regs[rs1] == regs[rs2]) { pc += (signed int)B_imm - 4; } break;////////////////////////
+			cout << "\tBEQ\tx" << dec << rs1 << ", x" << dec << rs2 << ", " << hex << "0x" << pc+(signed int)B_imm - 4 << "\n";
+			if (regs[rs1] == regs[rs2]) { pc += (signed int)B_imm - 4; } break;
 		case 1:
-			cout << "\tBNE\tx" << dec << rs1 << ", x" << dec << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
-			if (regs[rs1] != regs[rs2]) { pc += (signed int)B_imm - 4; } break;//////////////////////////
-		case 4: //2
-			cout << "\tBLT\tx" << dec << rs1 << ", x" << dec << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
-			if (regs[rs1] < regs[rs2]) { pc += (signed int)B_imm - 4; } break;//////////////
-		case 5: //3
-			cout << "\tBGE\tx" << dec << rs1 << ", x" << dec << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
-			if (regs[rs1] >= regs[rs2]) { pc += (signed int)B_imm - 4; } break;////////////////
-		case 6://4
-			cout << "\tBLTU\tx" << dec << rs1 << ", x" << dec << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
-			if ((unsigned int)regs[rs1] < (unsigned int)regs[rs2]) { pc += (signed int)B_imm - 4; } break;////////////////
-		case 7://5
-			cout << "\tBGEU\tx" << dec << rs1 << ", x" << dec << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
-			if ((unsigned int)regs[rs1] >= (unsigned int)regs[rs2]) { pc += (signed int)B_imm - 4; } break;////////
+			cout << "\tBNE\tx" << dec << rs1 << ", x" << dec << rs2 << ", " << hex << "0x" << pc+(signed int)B_imm - 4 << "\n";
+			if (regs[rs1] != regs[rs2]) { pc += (signed int)B_imm - 4; } break;/
+		case 4:
+			cout << "\tBLT\tx" << dec << rs1 << ", x" << dec << rs2 << ", " << hex << "0x" << pc+(signed int)B_imm - 4 << "\n";
+			if (regs[rs1] < regs[rs2]) { pc += (signed int)B_imm - 4; } break;
+		case 5:
+			cout << "\tBGE\tx" << dec << rs1 << ", x" << dec << rs2 << ", " << hex << "0x" << pc+(signed int)B_imm - 4 << "\n";
+			if (regs[rs1] >= regs[rs2]) { pc += (signed int)B_imm - 4; } break;
+		case 6:
+			cout << "\tBLTU\tx" << dec << rs1 << ", x" << dec << rs2 << ", " << hex << "0x" << pc+(signed int)B_imm - 4 << "\n";
+			if ((unsigned int)regs[rs1] < (unsigned int)regs[rs2]) { pc += (signed int)B_imm - 4; } break;
+		case 7:
+			cout << "\tBGEU\tx" << dec << rs1 << ", x" << dec << rs2 << ", " << hex << "0x" << pc+(signed int)B_imm - 4 << "\n";
+			if ((unsigned int)regs[rs1] >= (unsigned int)regs[rs2]) { pc += (signed int)B_imm - 4; } break;
 		default:cout << "\tUnknown SB instruction\n";
 		}
 	}
@@ -472,15 +452,15 @@ void instDecExec(unsigned int instWord)
 	}
 	else if (opcode == 0x6F)//JAL
 	{
-		cout << "\tJAL\tx" << dec << rd << ", x" << dec << rs1 << ", " << hex << "0x" << (int)J_imm << "\n";
+		cout << "\tJAL\tx" << dec << rd << ", x" << dec << rs1 << ", " << hex << "0x" << pc + (signed)J_imm - 4 << "\n";
 		regs[rd] = pc + 4;
 		pc = pc + (signed)J_imm - 4;
 	}
 	else if (opcode == 0x67)//JALR
 	{
-		cout << "\tJALR\tx" << dec << rd << ", x" << dec << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+		cout << "\tJALR\tx" << dec << rd << ", x" << dec << rs1 << ", " << hex << "0x" << regs[rs1] + (signed)I_imm - 4 << "\n";
 		regs[rd] = pc + 4;
-		pc = regs[rs1] + (signed)I_imm - 4;//-4 added
+		pc = regs[rs1] + (signed)I_imm - 4;
 	}
 	else if (opcode == 0x73)
 	{
@@ -527,14 +507,8 @@ int main(int argc, char *argv[]) {
 				pc += 2;
 				instDecExecC(instWord);
 			}
-			// remove the following line once you have a complete simulator
-			//if (pc > 65) break;		// stop when PC reached address 32 Has been disabled as ecaller should work!
 
 		}
-
-		// dump the registers
-		//for (int i = 0; i < 32; i++)
-		//	cout << "x" << dec << i << ": \t" << "0x" << hex << std::setfill('0') << std::setw(8) << regs[i] << "\n";
 
 	}
 	else emitError((char*)"Cannot access input file\n"); return 0;
