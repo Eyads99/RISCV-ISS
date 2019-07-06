@@ -410,7 +410,7 @@ void instDecExec(unsigned int instWord)
 			cout << "\tBLTU\tx" << dec << rs1 << ", x" << dec << rs2 << ", " << hex << "0x" << pc + (signed int)B_imm - 4 << "\n";
 			if ((unsigned int)regs[rs1] < (unsigned int)regs[rs2]) { pc += (signed int)B_imm - 4; } break;
 		case 7:
-			cout << "\tBGEU\tx" << dec << rs1 << " " << regs[rs1] << ", x" << dec << rs2 << " " << regs[rs2] << ", " << hex << "0x" << pc + (signed int)B_imm - 4 << "\n";
+			cout << "\tBGEU\tx" << dec << rs1 << ", x" << dec << rs2 << ", " << hex << "0x" << pc + (signed int)B_imm - 4 << "\n";
 			if ((unsigned int)regs[rs1] >= (unsigned int)regs[rs2]) { pc += (signed int)B_imm - 4; } break;
 		default:cout << "\tUnknown SB instruction\n";
 		}
