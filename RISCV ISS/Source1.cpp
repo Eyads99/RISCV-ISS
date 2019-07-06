@@ -213,13 +213,13 @@ void instDecExecC(unsigned int instWord)
 					break;
 				}
 			}
-			else {
+			    else {
 				if ((rd == 0) && (rs2 == 0)) {
-					//cout << "\tC.EBREAK\n"; //not implemented
+					//cout << "\tC.EBREAK NOT IMPLEMENTED\n"; //not implemented
 				}
 				else if (rs2 == 0) {
 					cout << "\tC.JALR\tx" << dec << rd << "\n";
-					regs[1] = pc + 2;
+					regs[1] = pc + 4;//+2;
 					pc = rd;
 					break;
 				}
@@ -415,22 +415,22 @@ void instDecExec(unsigned int instWord)
 	{
 		switch (funct3) {
 		case 0:
-			cout << "\tBEQ\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+			cout << "\tBEQ\tx"<<dec << rs1 << ", x"<<dec << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
 			if (regs[rs1] == regs[rs2]) { pc += (signed int)B_imm - 4; } break;////////////////////////
 		case 1:
-			cout << "\tBNE\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+			cout << "\tBNE\tx"<<dec << rs1 << ", x"<<dec << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
 			if (regs[rs1] != regs[rs2]) { pc += (signed int)B_imm - 4; } break;//////////////////////////
 		case 4: //2
-			cout << "\tBLT\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+			cout << "\tBLT\tx"<<dec << rs1 << ", x"<<dec << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
 			if (regs[rs1] < regs[rs2]) { pc += (signed int)B_imm - 4; } break;//////////////
 		case 5: //3
-			cout << "\tBGE\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+			cout << "\tBGE\tx"<<dec << rs1 << ", x"<<dec << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
 			if (regs[rs1] >= regs[rs2]) { pc += (signed int)B_imm - 4; } break;////////////////
 		case 6://4
-			cout << "\tBLTU\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+			cout << "\tBLTU\tx"<<dec << rs1 << ", x"<<dec << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
 			if ((unsigned int)regs[rs1] < (unsigned int)regs[rs2]) { pc += (signed int)B_imm - 4; } break;////////////////
 		case 7://5
-			cout << "\tBGEU\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+			cout << "\tBGEU\tx"<<dec << rs1 << ", x"<<dec << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
 			if ((unsigned int)regs[rs1] >= (unsigned int)regs[rs2]) { pc += (signed int)B_imm - 4; } break;////////
 		default:cout << "\tUnknown SB instruction\n";
 		}
@@ -462,23 +462,23 @@ void instDecExec(unsigned int instWord)
 	}
 	else if (opcode == 0x37)//LUI instruction
 	{
-		cout << "\tLUI\tx" << rd << ", " << hex << "0x" << (int)U_imm << "\n";
+		cout << "\tLUI\tx"<<dec << rd << ", " << hex << "0x" << (int)U_imm << "\n";
 		regs[rd] = U_imm << 12;
 	}
 	else if (opcode == 0x17)//AUIPC instruction
 	{
-		cout << "\tAUIPC\tx" << rd << ", " << hex << "0x" << (int)U_imm << "\n";
+		cout << "\tAUIPC\tx"<<dec << rd << ", " << hex << "0x" << (int)U_imm << "\n";
 		regs[rd] = pc + (U_imm << 12);
 	}
 	else if (opcode == 0x6F)//JAL
 	{
-		cout << "\tJAL\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)J_imm << "\n";
+		cout << "\tJAL\tx"<<dec << rd << ", x"<<dec << rs1 << ", " << hex << "0x" << (int)J_imm << "\n";
 		regs[rd] = pc + 4;
 		pc = pc + (signed)J_imm - 4;
 	}
 	else if (opcode == 0x67)//JALR
 	{
-		cout << "\tJALR\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+		cout << "\tJALR\tx"<<dec << rd << ", x"<<dec << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
 		regs[rd] = pc + 4;
 		pc = regs[rs1] + (signed)I_imm - 4;//-4 added
 	}
