@@ -180,7 +180,7 @@ void instDecExecC(unsigned int instWord)
 			break;
 		case 7:
 			cout << "\tC.BNEZ\tx" << dec << rd_c + 8 << (signed)CB_imm << "\n";
-			if (regs[rd_c + 8] != 0)
+			if (regs[rd_c + 8] /*!= 0*/)
 				pc = pc + (signed)CB_imm - 2;
 			break;
 		default:
@@ -201,7 +201,7 @@ void instDecExecC(unsigned int instWord)
 			break;
 
 		case 4:
-			if ((instWord >> 12) & 0x1 == 0) {
+			if (((instWord >> 12) & 0x1) == 0) {
 				if (rs2 == 0) {
 					cout << "\tC.JR\tx" << dec << 0 << ", x" << rd << "\n";
 					pc = regs[rd];
@@ -219,8 +219,8 @@ void instDecExecC(unsigned int instWord)
 				}
 				else if (rs2 == 0) {
 					cout << "\tC.JALR\tx" << dec << rd << "\n";
-					regs[1] = pc + 4;//+2;
-					pc = rd;
+					regs[1] = pc ;//+2;
+					pc = regs[rd];
 					break;
 				}
 				else {
@@ -289,48 +289,48 @@ void instDecExec(unsigned int instWord)
 	if (opcode == 0x33) {		// R Instructions
 		switch (funct3) {
 		case 0: if (funct7 == 32) {
-			cout << "\tSUB\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+			cout << "\tSUB\tx"<<dec << rd << ", x"<<dec << rs1 << ", x" << rs2 << "\n";
 			regs[rd] = regs[rs1] - regs[rs2];
 		}
 				else {
-			cout << "\tADD\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+			cout << "\tADD\tx"<<dec << rd << ", x"<<dec << rs1 << ", x" << rs2 << "\n";
 			regs[rd] = regs[rs1] + regs[rs2];
 		}
 				break;
 		case 1:
-			cout << "\tSLL\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+			cout << "\tSLL\tx"<<dec << rd << ", x"<<dec << rs1 << ", x" << rs2 << "\n";
 			regs[rd] = regs[rs1] << regs[rs2];
 			break;
 		case 2:
-			cout << "\tSLT\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";/////////////////not done
+			cout << "\tSLT\tx"<<dec << rd << ", x"<<dec << rs1 << ", x" << rs2 << "\n";/////////////////not done
 			if ((signed)regs[rs1] < (signed)regs[rs2]) regs[rd] = 1; else regs[rd] = 0;
 			break;
 		case 3:
-			cout << "\tSLTU\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";/////////////////not done
+			cout << "\tSLTU\tx"<<dec << rd << ", x"<<dec << rs1 << ", x" << rs2 << "\n";/////////////////not done
 			if ((unsigned)regs[rs1] < (unsigned)regs[rs2]) regs[rd] = 1; else regs[rd] = 0;
 			break;
 		case 4:
-			cout << "\tXOR\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+			cout << "\tXOR\tx"<<dec << rd << ", x"<<dec << rs1 << ", x" << rs2 << "\n";
 			regs[rd] = regs[rs1] ^ regs[rs2];
 			break;
 		case 5:
 			if (funct7 == 32)
 			{
-				cout << "\tSRA\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+				cout << "\tSRA\tx"<<dec << rd << ", x"<<dec << rs1 << ", x" << rs2 << "\n";
 				regs[rd] = (signed int)regs[rs1] >> regs[rs2];
 			}
 			else
 			{
-				cout << "\tSRL\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+				cout << "\tSRL\tx"<<dec << rd << ", x"<<dec << rs1 << ", x" << rs2 << "\n";
 				regs[rd] = (unsigned int)regs[rs1] >> regs[rs2];
 			}
 			break;
 		case 6:
-			cout << "\tOR\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+			cout << "\tOR\tx"<<dec << rd << ", x"<<dec << rs1 << ", x" << rs2 << "\n";
 			regs[rd] = regs[rs1] | regs[rs2];
 			break;
 		case 7:
-			cout << "\tand\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+			cout << "\tand\tx"<<dec << rd << ", x"<<dec << rs1 << ", x" << rs2 << "\n";
 			regs[rd] = regs[rs1] & regs[rs2];
 			break;
 		default:
@@ -341,15 +341,15 @@ void instDecExec(unsigned int instWord)
 	}
 	else if (opcode == 0x13) {	// I instructions
 		switch (funct3) {
-		case 0:	cout << "\tADDI\tx" << dec << rd << ", x" << rs1 << ", " << (int)I_imm << "\n";
+		case 0:	cout << "\tADDI\tx" << dec << rd << ", x"<<dec << rs1 << ", "<<dec << (int)I_imm << "\n";
 			regs[rd] = regs[rs1] + (signed)I_imm;
 			break;
 		case 2:
-			cout << "\tSLTI\tx" << dec << rd << ", x" << rs1 << ", " << (int)I_imm << "\n";
+			cout << "\tSLTI\tx" << dec << rd << ", x"<<dec << rs1 << ", " << (int)I_imm << "\n";
 			if ((signed)regs[rs1] < (signed int)I_imm)regs[rd] = 1; else regs[rd] = 0;
 			break;
 		case 3:
-			cout << "\tSLTIU\tx" << dec << rd << ", x" << rs1 << ", " << (int)I_imm << "\n";
+			cout << "\tSLTIU\tx" << dec << rd << ", x"<<dec << rs1 << ", " << (int)I_imm << "\n";
 			if ((unsigned)regs[rs1] < (unsigned)I_imm) regs[rd] = 1; else regs[rd] = 0;
 			break;
 		case 4:
